@@ -11,4 +11,4 @@ export function getStorage(name) {
 //删除缓存
 export function delStorage(name) {
     return localStorage.removeItem(name)
-}
+}`.`

@@ -1,69 +1,42 @@
-// src/stores/user.js
 import { defineStore } from 'pinia'
+import { login } from '@/api/auth'
+import { getStorage, setStorage, delStorage } from '@/utils/localStorage'
 
-// 存储用户的登录状态和权限信息
 export const useUserStore = defineStore('user', {
   state: () => ({
-    token: localStorage.getItem('user-token') || '',
+    token: getStorage('user-token') || '',
     name: '',
     roles: [],
-    permissions: [] // 关键：存储用户权限代码的数组
+    permissions: []
   }),
   actions: {
-    // 模拟登录成功后，设置用户信息
-    // 在实际项目中，你应该在登录接口成功后调用此方法
-    setUserInfo(userData) {
-      // 模拟后端返回的数据结构
-      const mockBackendResponse = {
-        admin: {
-          name: '管理员',
-          roles: ['ADMIN'],
-          permissions: ['data:view', 'data:import', 'data:export', 'data:clean', 'user:manage', 'log:audit']
-        },
-        researcher: {
-          name: '研究员',
-          roles: ['RESEARCHER'],
-          permissions: ['data:view', 'data:import', 'data:clean']
-        },
-        analyst: {
-          name: '分析师',
-          roles: ['ANALYST'],
-          permissions: ['data:view', 'data:export']
-        },
-        auditor: {
-          name: '审核员',
-          roles: ['AUDITOR'],
-          permissions: ['log:audit']
-        }
-      };
-
-      const info = mockBackendResponse[userData.username] || { name: '未知用户', roles: [], permissions: [] };
-
-      this.name = info.name;
-      this.roles = info.roles;
-      this.permissions = info.permissions;
-      this.token = userData.token; // 保存 token
-      localStorage.setItem('user-token', userData.token);
+    // 登录
+    login(userInfo) {
+      const { username, password, verificationCode } = userInfo
+      return new Promise((resolve, reject) => {
+        login({ userName: username.trim(), password: password, verificationCode: verificationCode }).then(res => {
+          const { data } = res
+          this.token = data.token
+          setStorage('user-token', data.token)
+          // 可以在这里同时保存 roles 和 name
+          this.name = data.userName
+          this.roles = data.roles
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
     },
 
-    // 退出登录
+    // 退出系统
     logout() {
-      this.token = '';
-      this.name = '';
-      this.roles = [];
-      this.permissions = [];
-      localStorage.removeItem('user-token');
-      // 可以选择性地跳转到登录页
-      // router.push('/login');
-    },
-
-    // 判断是否有某个权限
-    hasPermission(permission) {
-      // 管理员拥有所有权限
-      if (this.roles.includes('ADMIN')) {
-        return true;
-      }
-      return this.permissions.includes(permission);
+      return new Promise((resolve) => {
+        this.token = ''
+        this.roles = []
+        this.permissions = []
+        delStorage('user-token')
+        resolve()
+      })
     }
   }
 })
