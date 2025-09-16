@@ -1,202 +1,3 @@
-<!--<template>-->
-<!--  <div class="dashboard-container">-->
-<!--    <el-row :gutter="20">-->
-<!--      <el-col :span="6">-->
-<!--        <el-card shadow="hover" class="data-card">-->
-<!--          <div class="card-content">-->
-<!--            <div class="card-icon" style="background-color: #409EFF;">-->
-<!--              <el-icon><User /></el-icon>-->
-<!--            </div>-->
-<!--            <div class="card-text">-->
-<!--              <div class="card-num">{{ overviewData.users }}</div>-->
-<!--              <div>总用户数</div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
-<!--      <el-col :span="6">-->
-<!--        <el-card shadow="hover" class="data-card">-->
-<!--          <div class="card-content">-->
-<!--            <div class="card-icon" style="background-color: #67C23A;">-->
-<!--              <el-icon><Document /></el-icon>-->
-<!--            </div>-->
-<!--            <div class="card-text">-->
-<!--              <div class="card-num">{{ overviewData.reports }}</div>-->
-<!--              <div>分析报告数</div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
-<!--      <el-col :span="6">-->
-<!--        <el-card shadow="hover" class="data-card">-->
-<!--          <div class="card-content">-->
-<!--            <div class="card-icon" style="background-color: #E6A23C;">-->
-<!--              <el-icon><DataLine /></el-icon>-->
-<!--            </div>-->
-<!--            <div class="card-text">-->
-<!--              <div class="card-num">{{ overviewData.dataSize }}</div>-->
-<!--              <div>总数据量 (GB)</div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
-<!--      <el-col :span="6">-->
-<!--        <el-card shadow="hover" class="data-card">-->
-<!--          <div class="card-content">-->
-<!--            <div class="card-icon" style="background-color: #F56C6C;">-->
-<!--              <el-icon><WarnTriangleFilled /></el-icon>-->
-<!--            </div>-->
-<!--            <div class="card-text">-->
-<!--              <div class="card-num">{{ overviewData.alerts }}</div>-->
-<!--              <div>系统警报</div>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
-<!--    </el-row>-->
-
-<!--    <el-row :gutter="20" style="margin-top: 20px;">-->
-<!--      <el-col :span="12">-->
-<!--        <el-card shadow="hover">-->
-<!--          <template #header>-->
-<!--            <div>用户增长趋势</div>-->
-<!--          </template>-->
-<!--          <div ref="barChart" style="height: 400px;"></div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
-<!--      <el-col :span="12">-->
-<!--        <el-card shadow="hover">-->
-<!--          <template #header>-->
-<!--            <div>数据类型分布</div>-->
-<!--          </template>-->
-<!--          <div ref="pieChart" style="height: 400px;"></div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
-<!--    </el-row>-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script setup lang="ts">-->
-<!--import { ref, onMounted, reactive } from 'vue';-->
-<!--import * as echarts from 'echarts';-->
-<!--import { User, Document, DataLine, WarnTriangleFilled } from '@element-plus/icons-vue'-->
-
-<!--// 图表DOM元素的引用-->
-<!--const barChart = ref<HTMLElement>();-->
-<!--const pieChart = ref<HTMLElement>();-->
-
-<!--// 模拟的概览数据-->
-<!--const overviewData = reactive({-->
-<!--  users: 1024,-->
-<!--  reports: 256,-->
-<!--  dataSize: 512,-->
-<!--  alerts: 3-->
-<!--});-->
-
-<!--// onMounted 生命周期钩子，确保DOM渲染完毕后再初始化图表-->
-<!--onMounted(() => {-->
-<!--  initBarChart();-->
-<!--  initPieChart();-->
-<!--});-->
-
-<!--// 初始化柱状图-->
-<!--const initBarChart = () => {-->
-<!--  const myChart = echarts.init(barChart.value!);-->
-<!--  const option = {-->
-<!--    tooltip: {-->
-<!--      trigger: 'axis'-->
-<!--    },-->
-<!--    xAxis: {-->
-<!--      type: 'category',-->
-<!--      data: ['一月', '二月', '三月', '四月', '五月', '六月']-->
-<!--    },-->
-<!--    yAxis: {-->
-<!--      type: 'value'-->
-<!--    },-->
-<!--    series: [-->
-<!--      {-->
-<!--        name: '新增用户',-->
-<!--        data: [120, 200, 150, 80, 70, 110],-->
-<!--        type: 'bar'-->
-<!--      }-->
-<!--    ]-->
-<!--  };-->
-<!--  myChart.setOption(option);-->
-<!--};-->
-
-<!--// 初始化饼图-->
-<!--const initPieChart = () => {-->
-<!--  const myChart = echarts.init(pieChart.value!);-->
-<!--  const option = {-->
-<!--    tooltip: {-->
-<!--      trigger: 'item'-->
-<!--    },-->
-<!--    legend: {-->
-<!--      orient: 'vertical',-->
-<!--      left: 'left'-->
-<!--    },-->
-<!--    series: [-->
-<!--      {-->
-<!--        name: '数据来源',-->
-<!--        type: 'pie',-->
-<!--        radius: '50%',-->
-<!--        data: [-->
-<!--          { value: 1048, name: '电子病历' },-->
-<!--          { value: 735, name: '体检数据' },-->
-<!--          { value: 580, name: '穿戴设备' },-->
-<!--          { value: 484, name: '科研数据' },-->
-<!--          { value: 300, name: '其他' }-->
-<!--        ],-->
-<!--        emphasis: {-->
-<!--          itemStyle: {-->
-<!--            shadowBlur: 10,-->
-<!--            shadowOffsetX: 0,-->
-<!--            shadowColor: 'rgba(0, 0, 0, 0.5)'-->
-<!--          }-->
-<!--        }-->
-<!--      }-->
-<!--    ]-->
-<!--  };-->
-<!--  myChart.setOption(option);-->
-<!--};-->
-
-<!--</script>-->
-
-<!--<style scoped>-->
-<!--.dashboard-container {-->
-<!--  padding: 20px;-->
-<!--}-->
-<!--.data-card {-->
-<!--  color: #606266;-->
-<!--}-->
-<!--.card-content {-->
-<!--  display: flex;-->
-<!--  align-items: center;-->
-<!--}-->
-<!--.card-icon {-->
-<!--  font-size: 3rem;-->
-<!--  color: #fff;-->
-<!--  width: 80px;-->
-<!--  height: 80px;-->
-<!--  display: flex;-->
-<!--  align-items: center;-->
-<!--  justify-content: center;-->
-<!--  margin-right: 20px;-->
-<!--  border-radius: 4px;-->
-<!--}-->
-<!--.card-text {-->
-<!--  font-size: 1rem;-->
-<!--}-->
-<!--.card-num {-->
-<!--  font-size: 2rem;-->
-<!--  font-weight: bold;-->
-<!--}-->
-<!--</style>-->
-
-<!--*******************************************-->
-<!--*******************************************-->
-<!--*******************************************-->
-<!--*******************************************-->
 <template>
   <div class="dashboard-container">
     <el-row :gutter="20" class="panel-group">
@@ -272,10 +73,9 @@
 import { ref, onMounted, reactive } from 'vue';
 import { User, Files, CirclePlus, Finished } from '@element-plus/icons-vue';
 import BaseChart from '@/components/BaseChart.vue';
-// import { getDashboardData } from '@/api/dashboard';
+import { getDashboardData } from '@/api/dashboard'; // 引入真实的 API 请求
 
 // --- 响应式数据 ---
-// 顶部面板数据
 const panelData = reactive({
   totalUsers: 0,
   totalRecords: 0,
@@ -283,43 +83,29 @@ const panelData = reactive({
   pendingLogs: 0
 });
 
-// 趋势图 ECharts 配置
 const dailyTrendOption = ref({});
 
 // --- 方法 ---
 const fetchData = () => {
-  // **API 调用**: getDashboardData().then(response => { ... });
-  // 模拟从后端一次性获取所有数据
-  setTimeout(() => {
-    const mockData = {
-      panelData: {
-        totalUsers: 128,
-        totalRecords: 1530,
-        todayNewRecords: 22,
-        pendingLogs: 3
-      },
-      trendData: {
-        dates: ['2025-09-10', '2025-09-11', '2025-09-12', '2025-09-13', '2025-09-14', '2025-09-15', '2025-09-16'],
-        counts: [15, 8, 20, 18, 25, 22, 19]
-      }
-    };
+  // 调用真实的后端接口
+  getDashboardData().then(response => {
+    const data = response.data;
 
     // 更新面板数据
-    Object.assign(panelData, mockData.panelData);
+    Object.assign(panelData, data.panelData);
 
     // 更新图表配置
     dailyTrendOption.value = {
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: mockData.trendData.dates, boundaryGap: false, },
+      xAxis: { type: 'category', data: data.trendData.dates, boundaryGap: false },
       yAxis: { type: 'value' },
       grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
       series: [{
         name: '新增数量',
-        data: mockData.trendData.counts,
+        data: data.trendData.counts,
         type: 'line',
         smooth: true,
         areaStyle: {
-          // 渐变色
           color: {
             type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [{ offset: 0, color: 'rgba(58,132,255,0.5)' }, { offset: 1, color: 'rgba(58,132,255,0.1)' }]
@@ -327,8 +113,9 @@ const fetchData = () => {
         }
       }]
     };
-
-  }, 300); // 模拟网络延迟
+  }).catch(error => {
+    console.error("获取仪表盘数据失败:", error);
+  });
 };
 
 onMounted(() => {

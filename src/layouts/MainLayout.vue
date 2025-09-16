@@ -24,15 +24,12 @@
           <el-icon><Document /></el-icon>
           <span>数据管理</span>
         </el-menu-item>
-
         <el-menu-item index="/statistics">
-          <el-icon><DataLine /></el-icon> <span>统计分析</span>
+          <el-icon><PieChart /></el-icon> <span>统计分析</span>
         </el-menu-item>
-
         <el-menu-item index="/logs">
           <el-icon><Tickets /></el-icon> <span>日志审计</span>
         </el-menu-item>
-
         <el-menu-item index="/about">
           <el-icon><InfoFilled /></el-icon>
           <span>关于</span>
@@ -43,8 +40,8 @@
     <el-container>
       <el-header>
         <div class="header-content">
-          <span>欢迎您, admin</span>
-          <el-button type="primary" link @click="logout">退出登录</el-button>
+          <span>欢迎您, {{ userStore.name }}</span>
+          <el-button type="primary" link @click="handleLogout">退出登录</el-button>
         </div>
       </el-header>
 
@@ -55,43 +52,38 @@
   </el-container>
 </template>
 
-<script setup lang="ts">
-import { RouterView, useRouter } from 'vue-router'
-import { DataLine, Document, User, InfoFilled } from '@element-plus/icons-vue'
+<script setup>
+import { RouterView } from 'vue-router'
+import { DataLine, Document, User, InfoFilled, PieChart, Tickets } from '@element-plus/icons-vue'
 import { ElMessageBox, ElMessage } from 'element-plus';
+import { useUserStore } from '@/stores/user';
 
-const router = useRouter();
+const userStore = useUserStore();
 
-const logout = () => {
+const handleLogout = () => {
   ElMessageBox.confirm('您确定要退出登录吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    // 在这里执行登出操作，例如清除token
-    localStorage.removeItem('user-token');
-    ElMessage({
-      type: 'success',
-      message: '已成功退出',
+    userStore.logout().then(() => {
+      ElMessage({
+        type: 'success',
+        message: '已成功退出',
+      });
     });
-    router.push('/login');
-  }).catch(() => {
-    // 用户点击了取消
-  });
+  }).catch(() => {});
 }
-
 </script>
 
 <style scoped>
 .layout-container {
   height: 100vh;
 }
-
 .el-aside {
   background-color: #222d32;
   color: white;
 }
-
 .logo {
   height: 60px;
   line-height: 60px;
@@ -100,11 +92,9 @@ const logout = () => {
   font-weight: bold;
   background-color: #1e282c;
 }
-
 .el-menu {
   border-right: none;
 }
-
 .el-header {
   display: flex;
   align-items: center;
@@ -112,7 +102,9 @@ const logout = () => {
   background-color: #fff;
   border-bottom: 1px solid #dcdfe6;
 }
-
+.header-content span {
+  margin-right: 15px;
+}
 .el-main {
   background-color: #f4f4f5;
   padding: 20px;

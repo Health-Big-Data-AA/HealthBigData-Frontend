@@ -15,7 +15,7 @@
         <el-form-item prop="username">
           <el-input
             v-model="loginForm.username"
-            placeholder="请输入用户名"
+            placeholder="请输入用户名 (admin)"
             :prefix-icon="User"
             size="large"
             clearable
@@ -25,7 +25,7 @@
           <el-input
             v-model="loginForm.password"
             type="password"
-            placeholder="请输入密码"
+            placeholder="请输入密码 (123456)"
             :prefix-icon="Lock"
             size="large"
             show-password
@@ -39,6 +39,7 @@
             :prefix-icon="Key"
             size="large"
             class="code-input"
+            @keyup.enter="handleLogin"
           >
             <template #append>
               <el-button @click="handleGetCode" :disabled="isCodeLoading">
@@ -63,16 +64,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import type { FormInstance, FormRules } from 'element-plus';
 import { User, Lock, Key } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/user';
 import { getLoginCode } from '@/api/auth';
 
-const loginFormRef = ref<FormInstance>();
+const loginFormRef = ref(null);
 const loading = ref(false);
 const isCodeLoading = ref(false);
 const codeButtonText = ref('获取验证码');
@@ -85,13 +85,12 @@ const loginForm = reactive({
   verificationCode: ''
 });
 
-const loginRules = reactive<FormRules>({
+const loginRules = reactive({
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   verificationCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
 });
 
-// 获取验证码
 const handleGetCode = () => {
   if (!loginForm.username) {
     ElMessage.warning('请先输入用户名');
@@ -100,8 +99,7 @@ const handleGetCode = () => {
   isCodeLoading.value = true;
   codeButtonText.value = '发送中...';
   getLoginCode({ userName: loginForm.username }).then(res => {
-    ElMessage.success(res.data); // 后端模拟返回了验证码，我们直接提示
-    // 在真实场景中，这里会开始倒计时
+    ElMessage.success(res.data);
     isCodeLoading.value = false;
     codeButtonText.value = '获取验证码';
   }).catch(() => {
@@ -110,9 +108,8 @@ const handleGetCode = () => {
   });
 };
 
-// 登录按钮点击事件
 const handleLogin = () => {
-  loginFormRef.value?.validate((valid) => {
+  loginFormRef.value.validate((valid) => {
     if (valid) {
       loading.value = true;
       userStore.login(loginForm).then(() => {
@@ -135,7 +132,6 @@ const handleLogin = () => {
   height: 100vh;
   background: linear-gradient(135deg, #71b7e6, #9b59b6);
 }
-
 .login-card {
   width: 420px;
   background-color: rgba(255, 255, 255, 0.85);
@@ -144,14 +140,12 @@ const handleLogin = () => {
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
-
 .card-header {
   text-align: center;
   font-size: 1.6rem;
   font-weight: bold;
   color: #333;
 }
-
 .code-input .el-input-group__append {
   padding: 0 10px;
 }

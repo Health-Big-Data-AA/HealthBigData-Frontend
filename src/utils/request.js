@@ -2,47 +2,56 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/user'
 
-const URL = "http://localhost:8080"
-// create an axios instance
+// 后端 API 的基础地址
+const baseURL = "http://localhost:8080"
+
+// 创建 axios 实例
 const service = axios.create({
-  baseURL: URL, // url = base url + request url
-  timeout: 10000, // request timeout
+  baseURL: baseURL,
+  timeout: 10000,
 })
 
-// http request 拦截器
+// Request 拦截器
 service.interceptors.request.use(
   config => {
     const userStore = useUserStore()
     if (userStore.token) {
-      // 让每个请求携带自定义 token
       config.headers['Authorization'] = 'Bearer ' + userStore.token
     }
     return config
   },
   error => {
-    console.log(error) // for debug
+    console.log(error)
     return Promise.reject(error)
   }
 )
 
-// http response 拦截器
+// Response 拦截器
 service.interceptors.response.use(
   response => {
+    // 如果是文件流，直接返回
+    if (response.request.responseType === 'blob') {
+      return response;
+    }
     const res = response.data
-    // code为200，一切正常
-    if (res.code === 200) {
-      return res
-    } else {
+    // code 不是 200 的情况
+    if (res.code !== 200) {
       ElMessage({
         message: res.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
+      // 401: Token 过期
+      if (res.code === 401) {
+        useUserStore().logout();
+      }
       return Promise.reject(new Error(res.msg || 'Error'))
+    } else {
+      return res
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    console.log('err' + error)
     ElMessage({
       message: error.message,
       type: 'error',

@@ -1,11 +1,10 @@
-// src/api/log.js
-import request from '@/utils/request'; // 引入您封装的 axios 实例
+import request from '@/utils/request';
 
-// 查询操作日志列表
-export function listLogs(query) {
+// 搜索并分页查询日志列表
+export function searchLogs(data) {
   return request({
-    url: '/api/logs/list', // 后端接口地址
-    method: 'get',
-    params: query
+    url: '/api/logs/search',
+    method: 'post',
+    data: data
   });
 }

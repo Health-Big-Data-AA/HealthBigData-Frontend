@@ -9,15 +9,6 @@ export function login(data) {
   });
 }
 
-// 注册方法
-export function register(data) {
-  return request({
-    url: '/api/auth/register',
-    method: 'post',
-    data: data
-  });
-}
-
 // 获取登录验证码
 export function getLoginCode(data) {
   return request({

@@ -1,29 +1,33 @@
-// src/api/statistics.js
-import request from '@/utils/request'; // 引入您封装的 axios 实例
+import request from '@/utils/request';
 
-// 获取患者年龄分布数据
-export function getAgeDistribution(query) {
+// 获取描述性统计
+export function getStatistics() {
   return request({
-    url: '/api/stats/age-distribution',
-    method: 'get',
-    params: query
+    url: '/api/statistics',
+    method: 'get'
   });
 }
 
-// 获取记录类型统计数据
-export function getRecordTypeStats(query) {
+// 获取分组对比统计
+export function getGroupedStatistics() {
   return request({
-    url: '/api/stats/record-type',
-    method: 'get',
-    params: query
+    url: '/api/statistics/grouped-by-type',
+    method: 'get'
   });
 }
 
-// 获取每日新增记录趋势数据
-export function getDailyTrend(query) {
+// 获取相关性分析
+export function getCorrelation() {
   return request({
-    url: '/api/stats/daily-trend',
-    method: 'get',
-    params: query
+    url: '/api/statistics/correlation',
+    method: 'get'
+  });
+}
+
+// 获取趋势分析
+export function getTrend() {
+  return request({
+    url: '/api/statistics/trend/weight-by-month',
+    method: 'get'
   });
 }
