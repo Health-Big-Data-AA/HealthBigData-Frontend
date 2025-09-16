@@ -24,6 +24,15 @@
           <el-icon><Document /></el-icon>
           <span>数据管理</span>
         </el-menu-item>
+
+        <el-menu-item index="/statistics">
+          <el-icon><DataLine /></el-icon> <span>统计分析</span>
+        </el-menu-item>
+
+        <el-menu-item index="/logs">
+          <el-icon><Tickets /></el-icon> <span>日志审计</span>
+        </el-menu-item>
+
         <el-menu-item index="/about">
           <el-icon><InfoFilled /></el-icon>
           <span>关于</span>

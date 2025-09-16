@@ -6,6 +6,9 @@ import MainLayout from '../layouts/MainLayout.vue'
 import HomeView from '../views/HomeView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
 import AboutView from '../views/AboutView.vue'
+import DataManagementView from '../views/DataManagementView.vue'
+import StatisticsView from '../views/StatisticsView.vue';
+import LogAuditView from '../views/LogAuditView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +36,29 @@ const router = createRouter({
           component: UserManagementView,
           meta: { requiresAuth: true }
         },
+
+        {
+          path: 'statistics', // 访问路径 /statistics
+          name: 'statistics',
+          component: StatisticsView,
+          meta: { requiresAuth: true, title: '统计分析' }
+        },
+
+        {
+          path: 'data', // 定义 URL 路径 /data
+          name: 'data', // 定义路由名称
+          component: DataManagementView, // 关联组件
+          meta: { requiresAuth: true, title: '数据管理' } // 同样需要登录验证，并添加页面标题
+        },
+
+        // 2. 在这里添加新路由
+        {
+          path: 'logs', // 访问路径 /logs
+          name: 'logs',
+          component: LogAuditView,
+          meta: { requiresAuth: true, title: '日志审计' }
+        },
+
         {
           path: 'about',
           name: 'about',
