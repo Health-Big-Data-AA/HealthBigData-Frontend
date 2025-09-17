@@ -1,4 +1,4 @@
-import request from '../router/request.js';
+import request from '../utils/request.js';
 
 /**
  * 根据ID查询日志

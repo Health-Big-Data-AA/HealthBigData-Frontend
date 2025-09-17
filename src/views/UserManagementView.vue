@@ -15,7 +15,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import api from '@/router/request';
+import api from '@/utils/request';
 
 // 定义部门数据的接口类型
 interface Department {

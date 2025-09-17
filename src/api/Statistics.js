@@ -1,4 +1,4 @@
-import request from '../router/request.js';
+import request from '../utils/request.js';
 
 /**
  * 获取患者记录的描述性统计信息
