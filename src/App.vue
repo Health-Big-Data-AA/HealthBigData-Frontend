@@ -1,14 +1,16 @@
-<script setup lang="ts">
-import { RouterView } from 'vue-router'
-</script>
-
 <template>
-  <RouterView />
+  <router-view />
 </template>
 
+<script setup>
+import Login from './views/LoginView.vue';
+</script>
+
 <style>
-/* 您可以保留一些全局样式，或者将它们移动到 main.css */
-#app {
-  height: 100vh;
+/* 可以在这里添加一些全局的重置样式 */
+body {
+  margin: 0;
+  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB',
+  'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
 }
 </style>
