@@ -6,10 +6,10 @@ import LoginView from '../views/LoginView.vue'
 import MainLayout from '../layouts/MainLayout.vue'
 import Dashboard from '../views/DashboardView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
-import RoleManagementView from '../views/RoleManagementView.vue';
+import RoleManagementView from '../views/RoleManagementView.vue'
+import DataManagementView from '../views/DataManagementView.vue'
 // import TagManagementView from '../views/TagManagementView.vue';
 // import AboutView from '../views/AboutView.vue'
-// import DataManagementView from '../views/DataManagementView.vue'
 // import StatisticsView from '../views/StatisticsView.vue';
 // import LogAuditView from '../views/LogAuditView.vue';
 
@@ -52,6 +52,12 @@ const router = createRouter({
           component: RoleManagementView,
           meta: { requiresAuth: true, title: '角色管理',roles: ['ADMIN'] }
         },
+        {
+          path: 'data',
+          name: 'data',
+          component: DataManagementView,
+          meta: { requiresAuth: true, title: '数据管理', }
+        },
         // {
         //   path: 'tags',
         //   name: 'tags',
@@ -63,12 +69,6 @@ const router = createRouter({
         //   name: 'statistics',
         //   component: StatisticsView,
         //   meta: { requiresAuth: true, title: '统计分析' }
-        // },
-        // {
-        //   path: 'data',
-        //   name: 'data',
-        //   component: DataManagementView,
-        //   meta: { requiresAuth: true, title: '数据管理' }
         // },
         // {
         //   path: 'logs',

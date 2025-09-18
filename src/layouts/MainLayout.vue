@@ -24,13 +24,13 @@
           <el-icon><Postcard /></el-icon>
           <span>角色管理</span>
         </el-menu-item>
-        <el-menu-item index="/app/tags">
-          <el-icon><Tickets /></el-icon>
-          <span>标签管理</span>
-        </el-menu-item>
         <el-menu-item index="/app/data">
           <el-icon><Document /></el-icon>
           <span>数据管理</span>
+        </el-menu-item>
+        <el-menu-item index="/app/tags">
+          <el-icon><Tickets /></el-icon>
+          <span>标签管理</span>
         </el-menu-item>
         <el-menu-item index="/app/statistics">
           <el-icon><PieChart /></el-icon> <span>统计分析</span>
