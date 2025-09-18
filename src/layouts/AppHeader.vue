@@ -41,7 +41,6 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-
       <el-button v-else type="primary" plain @click="goTo('/login')">登录 / 注册</el-button>
     </div>
   </header>
@@ -60,13 +59,9 @@ const goTo = (path) => {
   router.push(path);
 };
 
+// The logo now always takes you to the main landing page
 const goHome = () => {
-  // If logged in, go to dashboard, otherwise go to landing page
-  if (userStore.token) {
-    router.push('/dashboard');
-  } else {
-    router.push('/');
-  }
+  router.push('/');
 }
 
 const handleLogout = () => {
@@ -77,7 +72,6 @@ const handleLogout = () => {
   }).then(() => {
     userStore.logout().then(() => {
       ElMessage.success('已成功退出');
-      // After logout, redirect to the landing page
       router.push('/');
     });
   }).catch(() => {});
@@ -90,108 +84,81 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  // --- Style Correction Starts Here ---
-  // 1. 使用足够不透明度的浅色背景，营造明亮的玻璃感
-  background-color: rgba(252, 252, 252, 0.7); // A light background with 70% opacity
-  // 2. 模糊效果依然是核心
-  backdrop-filter: blur(12px);
-  // 3. 底部描边改为深色，以在浅色背景下可见
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  // --- Style Correction Ends Here ---
-
   padding: 0 30px;
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
   box-sizing: border-box;
+
+  // --- Linear Style Redesign ---
+  background-color: rgba(18, 24, 38, 0.7); // Darker, more integrated background
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1); // Thin stroke
+
+  // Top glowing line
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.2), rgba(255,255,255,0));
+  }
 }
 
-// Left side: Logo
 .header-left .logo {
   display: flex;
   align-items: center;
   font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
+  color: #f0f0f0;
+  transition: color 0.3s ease;
 
-  // --- Style Correction Starts Here ---
-  // 4. Logo文字改为深色
-  span {
-    color: #333;
+  &:hover {
+    color: #fff;
   }
-  // --- Style Correction Ends Here ---
-
   .el-icon {
     margin-right: 8px;
     color: #409EFF;
   }
 }
 
-// Center: Navigation Menu
-.header-center {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  .top-menu {
-    border-bottom: none;
-    .el-menu-item {
-      font-size: 1rem;
-      font-weight: 500;
-      padding: 0 20px;
-      background-color: transparent !important;
+.header-center .top-menu {
+  border-bottom: none;
+  .el-menu-item {
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0 20px;
+    background-color: transparent !important;
+    color: #a7b1c2;
+    transition: color 0.3s ease;
 
-      // --- Style Correction Starts Here ---
-      // 5. 菜单文字改为深色系
-      color: #606266;
-      &:hover {
-        color: #000000;
-      }
-      &.is-active {
-        color: #000000 !important;
-        border-bottom: 2px solid #409EFF !important; // Add an active indicator
-      }
-      // --- Style Correction Ends Here ---
+    &:hover {
+      color: #ffffff;
+    }
+    &.is-active {
+      color: #ffffff !important;
     }
   }
 }
 
-// Right side: User Profile
-.header-right {
-  .user-profile {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    // --- Style Correction Starts Here ---
-    // 6. 用户名改为深色
-    color: #606266;
-    font-weight: 500;
-    &:hover {
-      color: #000000;
-    }
-    // --- Style Correction Ends Here ---
-
-    .user-avatar {
-      margin-right: 10px;
-      background-color: #409EFF;
-      font-weight: bold;
-    }
-    .user-name {
-      margin-right: 5px;
-    }
+.header-right .user-profile {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #e0e0e0;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  &:hover {
+    color: #ffffff;
   }
-
-  .el-button {
-    // 登录按钮样式也更新为浅色版本
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(0, 0, 0, 0.2);
-    color: #333;
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.1);
-      border-color: rgba(0, 0, 0, 0.3);
-      color: #000;
-    }
+  .user-avatar {
+    margin-right: 10px;
+    background-color: #409EFF;
+    font-weight: bold;
   }
 }
 
