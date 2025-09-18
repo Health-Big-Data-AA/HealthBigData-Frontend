@@ -167,41 +167,6 @@ const handleLogin = () => {
   });
 };
 
-// const handleLogin = async () => {
-//   if (!loginFormRef.value) return;
-//
-//   const valid = await loginFormRef.value.validate();
-//
-//   if (!valid) {
-//     ElMessage.error('请填写完整的登录信息');
-//     return;
-//   }
-//
-//   loading.value = true;
-//   try {
-//     const response = await login({
-//       empName: loginForm.empName,
-//       empId: loginForm.empId,
-//     });
-//
-//     // 后端返回 boolean 值
-//     // @ts-ignore
-//     if (response === true) {
-//       ElMessage.success('登录成功！');
-//       // 登录成功，存储一个标记
-//       localStorage.setItem('user-token', `user-${loginForm.empId}`);
-//       router.push({ name: 'users' });
-//     } else {
-//       ElMessage.error('员工ID或用户名不匹配！');
-//     }
-//   } catch (error) {
-//     console.error("登录请求失败:", error);
-//     // ElMessage 已经在拦截器中处理了
-//   } finally {
-//     loading.value = false;
-//   }
-// };
-
 const handleRegister = () => {
   registerFormRef.value.validate((valid) => {
     if (valid) {

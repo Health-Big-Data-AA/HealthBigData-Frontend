@@ -1,8 +1,8 @@
-@use 'variables';
-@use 'mixin';
-@use 'sidebar';
-@use 'element';
-@use 'transition';
+@import 'variables';
+@import 'mixin';
+@import 'sidebar';
+@import 'element';
+@import 'transition';
 
 html,
 body {
