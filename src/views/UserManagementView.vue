@@ -91,7 +91,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { listUsers, delUser, updateUser, addUser, getUser } from '@/api/user';
@@ -165,7 +165,8 @@ function resetQuery() {
 }
 
 function handleStatusChange(row) {
-  let text = row.status === 1 ? "启用" : "禁用";
+  // 【修正二】将 let 改为 const
+  const text = row.status === 1 ? "启用" : "禁用";
   ElMessageBox.confirm(`确认要"${text}""${row.userName}"用户吗？`, '警告', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',

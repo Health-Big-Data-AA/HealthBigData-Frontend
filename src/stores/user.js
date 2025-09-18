@@ -23,6 +23,8 @@ export const useUserStore = defineStore('user', {
           setStorage('user-token', data.token)
           setStorage('user-name', data.userName)
           setStorage('user-roles', data.roles)
+          // 【修改】跳转到应用仪表盘
+          router.push({ path: '/app/dashboard' });
           resolve()
         }).catch(error => {
           reject(error)
@@ -44,14 +46,12 @@ export const useUserStore = defineStore('user', {
       })
     },
 
-    // **【新增】** 判断用户是否拥有特定权限
+    // 判断用户是否拥有特定权限
     hasPermission(requiredRole) {
       if (requiredRole && requiredRole.length > 0) {
-        // 检查用户的角色数组中是否包含所需的角色
-        // 假设 roles 数组中存储的是角色代码，如 ['ADMIN', 'RESEARCHER']
         return this.roles.includes(requiredRole);
       }
-      return true; // 如果没有指定权限要求，则默认允许访问
+      return true;
     }
   }
 })

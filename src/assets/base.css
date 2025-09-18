@@ -1,0 +1,25 @@
+/*
+  Set a persistent dark background on the root elements to prevent
+  the "white flash" during page transitions.
+*/
+html, body {
+  background-color: #0d1117; /* This matches our dark theme */
+  color: #e6edf3; /* A sensible default light text color */
+}
+
+/*
+  Original styles for the app container
+*/
+#app {
+  width: 100%;
+  height: 100%;
+  font-weight: normal;
+}
+
+/* Original styles for links */
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+}

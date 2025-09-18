@@ -17,6 +17,12 @@
         <el-col :span="1.5">
           <el-button type="warning" icon="Download" @click="handleExport">导出数据</el-button>
         </el-col>
+        <el-col :span="1.5">
+          <el-button type="primary" icon="MagicStick" @click="handleCleanse">数据清洗</el-button>
+        </el-col>
+        <el-col :span="1.5">
+          <el-button type="info" icon="Delete" @click="handleDeduplicate">数据去重</el-button>
+        </el-col>
       </el-row>
 
       <el-table v-loading="loading" :data="recordList">
@@ -50,15 +56,42 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue';
+import type { AxiosResponse } from 'axios';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from '@/stores/user';
-import { listRecords, exportRecords } from '@/api/data';
+import { listRecords, exportRecords } from '@/api/record.js';
+import { cleanseData, deduplicateData } from '@/api/dataManagement.js';
 
+// --- 类型定义 ---
+interface PatientRecord {
+  recordId: number;
+  patientIdentifier: string;
+  recordType: string;
+  recordData: string;
+  createdByUserId: number;
+  createTime: string;
+  updateTime: string;
+}
+
+// Corrected: 使用泛型 <T> 来避免 data: any
+interface ApiResponse<T> {
+  code: number;
+  data: T;
+  msg: string;
+  total?: number; // 分页接口会有 total
+}
+
+interface PageData {
+  data: PatientRecord[];
+  total: number;
+}
+
+// --- 组件逻辑 ---
 const userStore = useUserStore();
 const loading = ref(true);
-const recordList = ref([]);
+const recordList = ref<PatientRecord[]>([]);
 const total = ref(0);
 
 const queryParams = reactive({
@@ -66,7 +99,7 @@ const queryParams = reactive({
   pageSize: 10,
 });
 
-const uploadUrl = ref("http://localhost:8080/api/records/import");
+const uploadUrl = ref(`${import.meta.env.VITE_APP_BASE_API}/records/import`);
 const uploadHeaders = computed(() => {
   return { 'Authorization': 'Bearer ' + userStore.token }
 });
@@ -77,35 +110,33 @@ onMounted(() => {
 
 function getList() {
   loading.value = true;
-  listRecords(queryParams).then(response => {
+  listRecords(queryParams).then((response: ApiResponse<PatientRecord[]>) => {
     recordList.value = response.data;
     total.value = response.total;
     loading.value = false;
   });
 }
 
-function formatJson(jsonString) {
+function formatJson(jsonString: string) {
   try {
     const obj = JSON.parse(jsonString);
     return JSON.stringify(obj, null, 2);
-  } catch (e) {
-    return jsonString; // 如果不是合法的JSON，则原样返回
+  } catch {
+    return jsonString;
   }
 }
 
-function handleUploadSuccess(response, file, fileList) {
-  // 注意：这里的 response 是 el-upload 组件封装过的，原始数据在 response.data
+function handleUploadSuccess(response: ApiResponse<string>) {
   if (response.code === 200) {
-    ElMessage.success(response.data || '数据导入成功！');
+    ElMessage.success(response.msg || '数据导入成功！');
     getList();
   } else {
     ElMessage.error(response.msg || '数据导入失败！');
   }
 }
 
-function handleUploadError(error) {
+function handleUploadError() {
   ElMessage.error('文件上传失败，请检查网络或联系管理员！');
-  console.error('Upload Error:', error);
 }
 
 function handleExport() {
@@ -114,7 +145,7 @@ function handleExport() {
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    exportRecords().then(response => {
+    exportRecords().then((response: AxiosResponse) => {
       const blob = new Blob([response.data], { type: response.headers['content-type'] });
       const downloadLink = document.createElement('a');
       const href = window.URL.createObjectURL(blob);
@@ -122,7 +153,7 @@ function handleExport() {
       let fileName = 'records.xlsx';
       if (contentDisposition) {
         const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
-        if (fileNameMatch.length === 2)
+        if (fileNameMatch && fileNameMatch.length === 2)
           fileName = fileNameMatch[1];
       }
       downloadLink.href = href;
@@ -131,6 +162,33 @@ function handleExport() {
       downloadLink.click();
       document.body.removeChild(downloadLink);
       window.URL.revokeObjectURL(href);
+    });
+  }).catch(() => {});
+}
+
+function handleCleanse() {
+  ElMessageBox.confirm('确认要执行数据清洗吗？此操作将扫描并报告无效数据。', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    cleanseData().then((response: ApiResponse<{ message: string }>) => {
+      ElMessageBox.alert(response.data.message, '清洗报告', {
+        confirmButtonText: '好的',
+      });
+    });
+  }).catch(() => {});
+}
+
+function handleDeduplicate() {
+  ElMessageBox.confirm('确认要执行数据去重吗？此操作将移除重复记录。', '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    deduplicateData().then((response: ApiResponse<{ message: string }>) => {
+      ElMessage.success(response.data.message);
+      getList();
     });
   }).catch(() => {});
 }

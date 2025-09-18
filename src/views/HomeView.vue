@@ -73,7 +73,7 @@
 import { ref, onMounted, reactive } from 'vue';
 import { User, Files, CirclePlus, Finished } from '@element-plus/icons-vue';
 import BaseChart from '@/components/BaseChart.vue';
-import { getDashboardData } from '@/api/dashboard'; // 引入真实的 API 请求
+import { getDashboardData } from '@/api/dashboard.js';
 
 // --- 响应式数据 ---
 const panelData = reactive({
@@ -118,6 +118,7 @@ const fetchData = () => {
   });
 };
 
+// --- 生命周期钩子 ---
 onMounted(() => {
   fetchData();
 });
@@ -141,6 +142,7 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 0 15px;
 
     .card-panel-icon-wrapper {
       padding: 16px;
@@ -150,18 +152,10 @@ onMounted(() => {
         font-size: 48px;
       }
     }
-    .icon-user {
-      color: #40c9c6;
-    }
-    .icon-data {
-      color: #36a3f7;
-    }
-    .icon-today {
-      color: #f4516c;
-    }
-    .icon-audit {
-      color: #34bfa3
-    }
+    .icon-user { color: #40c9c4; }
+    .icon-data { color: #36a3f7; }
+    .icon-today { color: #f4516c; }
+    .icon-audit { color: #34bfa3; }
 
     &:hover {
       .card-panel-icon-wrapper {
@@ -171,7 +165,6 @@ onMounted(() => {
 
     .card-panel-description {
       font-weight: bold;
-      margin: 0 26px;
       text-align: right;
       .card-panel-text {
         line-height: 18px;
@@ -180,7 +173,6 @@ onMounted(() => {
         margin-bottom: 12px;
       }
       .el-statistic {
-        // 覆盖 element-plus 的默认样式
         --el-statistic-content-font-size: 20px;
       }
     }

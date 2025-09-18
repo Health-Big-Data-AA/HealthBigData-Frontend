@@ -6,7 +6,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import permissionDirective from './directives/permission'
 
 import App from './App.vue'
-import router from './router/index.js'
+import router from './router' // <--- 修改这里，去掉文件名和后缀
 import './assets/main.css' // 引入基础样式
 import './styles/index.scss' // 全局引入 SCSS 样式
 
