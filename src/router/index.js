@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { ElMessage } from 'element-plus'
 
 // Import new LandingView
 import LandingView from '../views/LandingView.vue'
@@ -7,7 +6,7 @@ import LoginView from '../views/LoginView.vue'
 import MainLayout from '../layouts/MainLayout.vue'
 import Dashboard from '../views/DashboardView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
-// import RoleManagementView from '../views/RoleManagementView.vue';
+import RoleManagementView from '../views/RoleManagementView.vue';
 // import TagManagementView from '../views/TagManagementView.vue';
 // import AboutView from '../views/AboutView.vue'
 // import DataManagementView from '../views/DataManagementView.vue'
@@ -45,14 +44,14 @@ const router = createRouter({
           path: 'users',
           name: 'users',
           component: UserManagementView,
-          meta: { requiresAuth: true, title: '用户管理' }
+          meta: { requiresAuth: true, title: '用户管理',roles: ['ADMIN'] }
         },
-        // {
-        //   path: 'roles',
-        //   name: 'roles',
-        //   component: RoleManagementView,
-        //   meta: { requiresAuth: true, title: '角色管理' }
-        // },
+        {
+          path: 'roles',
+          name: 'roles',
+          component: RoleManagementView,
+          meta: { requiresAuth: true, title: '角色管理',roles: ['ADMIN'] }
+        },
         // {
         //   path: 'tags',
         //   name: 'tags',
@@ -88,20 +87,5 @@ const router = createRouter({
   ],
 })
 
-// Navigation Guard
-router.beforeEach((to, from, next) => {
-  // Allow access to public pages like landing and login
-  if (to.name === 'landing' || to.name === 'login') {
-    return next();
-  }
-
-  const loggedIn = !!localStorage.getItem('user-token');
-  if (!loggedIn && to.meta.requiresAuth) {
-    ElMessage.warning('请先登录');
-    return next({ name: 'login' });
-  }
-
-  next();
-});
 
 export default router

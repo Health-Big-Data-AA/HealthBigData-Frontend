@@ -1,6 +1,5 @@
 import request from '../utils/request.js';
 
-
 /**
  * 新增用户
  * @param {object} data - 用户数据
@@ -21,7 +20,7 @@ export function addUser(data) {
  */
 export function deleteUser(id) {
   return request({
-    url: `/api/users/${id}`,
+    url: `/api/users/${id}`, // RESTful风格，ID在路径中
     method: 'delete'
   })
 }
@@ -34,7 +33,7 @@ export function deleteUser(id) {
 export function updateUser(data) {
   return request({
     url: '/api/users',
-    method: 'put',
+    method: 'put', // 更新操作使用 PUT 方法
     data
   })
 }
@@ -46,20 +45,20 @@ export function updateUser(data) {
  */
 export function getUserById(id) {
   return request({
-    url: `/api/users/${id}`,
+    url: `/api/users/${id}`, // RESTful风格
     method: 'get'
   })
 }
 
 /**
  * 分页查询用户列表
- * @param {object} params - 分页参数, e.g., { pageNo: 1, pageSize: 10 }
+ * @param {object} params - 分页和查询参数, e.g., { pageNo: 1, pageSize: 10 }
  * @returns Promise
  */
 export function listUsersByPage(params) {
   return request({
-    url: '/api/users/page',
+    url: '/api/users/page', // 后端分页查询的URL
     method: 'get',
-    params
+    params // GET请求的参数使用params
   })
 }

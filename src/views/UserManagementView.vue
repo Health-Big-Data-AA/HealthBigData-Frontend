@@ -38,8 +38,11 @@
           </template>
         </el-table-column>
         <el-table-column label="创建时间" align="center" prop="createTime" width="160"/>
-        <el-table-column label="操作" align="center" width="150">
+        <el-table-column label="操作" align="center" width="220">
           <template #default="scope">
+            <el-button type="success" link icon="User" @click="handleAssignRole(scope.row)">
+              分配角色
+            </el-button>
             <el-button type="primary" link icon="Edit" @click="handleUpdate(scope.row)">
               编辑
             </el-button>
@@ -88,6 +91,22 @@
         <el-button type="primary" @click="submitForm">确 定</el-button>
       </template>
     </el-dialog>
+
+    <el-dialog title="分配角色" v-model="roleDialog.visible" width="500px">
+      <el-select v-model="roleDialog.assignedIds" multiple placeholder="请选择角色" style="width: 100%">
+        <el-option
+          v-for="item in roleDialog.allRoles"
+          :key="item.roleId"
+          :label="item.roleName"
+          :value="item.roleId"
+        />
+      </el-select>
+      <template #footer>
+        <el-button @click="roleDialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="submitRoleForm">保 存</el-button>
+      </template>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -95,7 +114,11 @@
 import { ref, reactive, onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { listUsersByPage, deleteUser, updateUser, addUser, getUserById } from '@/api/user.js';
+// 【新增】导入角色和用户角色API
+import { listRolesByPage } from '@/api/role.js';
+import { getRolesByUserId, assignRoleToUser, removeRoleFromUser } from '@/api/userRole.js';
 
+// ... (大部分 <script> 内容不变) ...
 const loading = ref(true);
 const userList = ref([]);
 const total = ref(0);
@@ -122,21 +145,77 @@ const form = ref({
   status: 1
 });
 
+// 【新增】分配角色的对话框数据
+const roleDialog = reactive({
+  visible: false,
+  userId: null,
+  allRoles: [],
+  assignedIds: []
+});
+
 const rules = reactive({
   userName: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
   passwordHash: [{ required: true, message: "密码不能为空", trigger: "blur" }],
   email: [{ type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }],
 });
 
+
 onMounted(() => {
   getList();
 });
+
+
+// --- 【新增】角色分配相关方法 ---
+
+/** 点击“分配角色”按钮 */
+async function handleAssignRole(row) {
+  roleDialog.userId = row.userId;
+
+  // 1. 获取所有角色列表
+  const allRolesRes = await listRolesByPage({ pageNo: 1, pageSize: 1000 });
+  roleDialog.allRoles = allRolesRes.data;
+
+  // 2. 获取当前用户已分配的角色
+  const assignedRolesRes = await getRolesByUserId(row.userId);
+  roleDialog.assignedIds = assignedRolesRes.data.map(ur => ur.roleId);
+
+  roleDialog.visible = true;
+}
+
+/** 提交角色分配表单 */
+async function submitRoleForm() {
+  const userId = roleDialog.userId;
+  const newRoleIds = new Set(roleDialog.assignedIds);
+
+  const assignedRolesRes = await getRolesByUserId(userId);
+  const oldRoleIds = new Set(assignedRolesRes.data.map(ur => ur.roleId));
+
+  const toAdd = [...newRoleIds].filter(id => !oldRoleIds.has(id));
+  const toRemove = [...oldRoleIds].filter(id => !newRoleIds.has(id));
+
+  try {
+    // 并行执行所有分配和移除操作
+    await Promise.all([
+      ...toAdd.map(roleId => assignRoleToUser({ userId, roleId })),
+      ...toRemove.map(roleId => removeRoleFromUser({ userId, roleId }))
+    ]);
+    ElMessage.success("角色分配成功");
+    roleDialog.visible = false;
+    getList(); // 刷新列表以更新用户角色信息
+  } catch (error) {
+    ElMessage.error("角色分配失败");
+  }
+}
+
+// --- 原有用户管理方法 (基本不变) ---
 
 function getList() {
   loading.value = true;
   listUsersByPage(queryParams).then(response => {
     userList.value = response.data;
     total.value = response.total;
+    loading.value = false;
+  }).catch(() => {
     loading.value = false;
   });
 }
@@ -205,7 +284,8 @@ function handleDelete(row) {
   }).then(() => {
     getList();
     ElMessage.success("删除成功");
-  }).catch(() => {});
+  }).catch(() => {
+  });
 }
 
 function cancel() {
@@ -233,9 +313,3 @@ function submitForm() {
   });
 }
 </script>
-
-<style scoped>
-.app-container {
-  padding: 20px;
-}
-</style>
