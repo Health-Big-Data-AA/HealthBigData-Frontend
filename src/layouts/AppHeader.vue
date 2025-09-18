@@ -90,10 +90,16 @@ const handleLogout = () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: rgba(11, 15, 25, 0.7);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
+
+  // --- Style Correction Starts Here ---
+  // 1. 使用足够不透明度的浅色背景，营造明亮的玻璃感
+  background-color: rgba(252, 252, 252, 0.7); // A light background with 70% opacity
+  // 2. 模糊效果依然是核心
+  backdrop-filter: blur(12px);
+  // 3. 底部描边改为深色，以在浅色背景下可见
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  // --- Style Correction Ends Here ---
+
   padding: 0 30px;
   position: sticky;
   top: 0;
@@ -102,18 +108,28 @@ const handleLogout = () => {
   box-sizing: border-box;
 }
 
+// Left side: Logo
 .header-left .logo {
   display: flex;
   align-items: center;
   font-size: 1.2rem;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
+
+  // --- Style Correction Starts Here ---
+  // 4. Logo文字改为深色
+  span {
+    color: #333;
+  }
+  // --- Style Correction Ends Here ---
+
   .el-icon {
     margin-right: 8px;
     color: #409EFF;
   }
 }
 
+// Center: Navigation Menu
 .header-center {
   flex-grow: 1;
   display: flex;
@@ -122,24 +138,40 @@ const handleLogout = () => {
     border-bottom: none;
     .el-menu-item {
       font-size: 1rem;
+      font-weight: 500;
       padding: 0 20px;
       background-color: transparent !important;
+
+      // --- Style Correction Starts Here ---
+      // 5. 菜单文字改为深色系
+      color: #606266;
       &:hover {
-        color: #ffffff;
+        color: #000000;
       }
+      &.is-active {
+        color: #000000 !important;
+        border-bottom: 2px solid #409EFF !important; // Add an active indicator
+      }
+      // --- Style Correction Ends Here ---
     }
   }
 }
 
+// Right side: User Profile
 .header-right {
   .user-profile {
     cursor: pointer;
     display: flex;
     align-items: center;
-    color: #e0e0e0;
+    // --- Style Correction Starts Here ---
+    // 6. 用户名改为深色
+    color: #606266;
+    font-weight: 500;
     &:hover {
-      color: #ffffff;
+      color: #000000;
     }
+    // --- Style Correction Ends Here ---
+
     .user-avatar {
       margin-right: 10px;
       background-color: #409EFF;
@@ -147,6 +179,18 @@ const handleLogout = () => {
     }
     .user-name {
       margin-right: 5px;
+    }
+  }
+
+  .el-button {
+    // 登录按钮样式也更新为浅色版本
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #333;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+      border-color: rgba(0, 0, 0, 0.3);
+      color: #000;
     }
   }
 }

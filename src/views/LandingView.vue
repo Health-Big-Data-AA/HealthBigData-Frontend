@@ -64,7 +64,7 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
   width: 100%;
   min-height: 100vh;
   position: relative;
-  overflow: hidden; // Hide the parts of aurora that go off-screen
+  overflow: hidden;
   animation: fadeIn 1s ease-in-out;
 }
 
@@ -73,7 +73,7 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
   to { opacity: 1; }
 }
 
-/* --- Aurora Background --- */
+/* Aurora Background (from previous step) */
 .aurora-background {
   position: absolute;
   top: 0;
@@ -97,7 +97,7 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
   to { transform: translate(100px, 50px) rotate(180deg) scale(1.2); }
 }
 
-/* --- Main Content --- */
+/* Main Content */
 .main-content {
   position: relative;
   z-index: 2;
@@ -123,6 +123,7 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin-bottom: 1rem;
+  letter-spacing: 1.5px; /* Add some letter spacing for a more solemn look */
 }
 
 .hero-subtitle {
@@ -152,29 +153,61 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
   gap: 25px;
 }
 
-/* --- News Card Styling --- */
+/* --- Linear Style News Card --- */
 .news-card {
-  background: rgba(30, 36, 50, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  // 1. A container for the glowing border effect
+  position: relative;
+  background: #161b22; // A dark, solid background
   border-radius: 12px;
+  border: 1px solid #30363d;
   padding: 25px;
-  text-align: left;
   cursor: pointer;
+  overflow: hidden; // Hide the parts of the glow that are outside the border
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  z-index: 1;
+
+  // 2. The glowing border pseudo-element
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    // A conic gradient for the rotating glow effect
+    background: conic-gradient(from 180deg at 50% 50%, #2a8af6 0deg, #a853ff 180deg, #2a8af6 360deg);
+    z-index: -2;
+    // Initially hidden
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  // 3. An inner background to overlay on top of the glow
+  &::after {
+    content: '';
+    position: absolute;
+    top: 1px; right: 1px; bottom: 1px; left: 1px;
+    background: #161b22;
+    border-radius: 11px;
+    z-index: -1;
+  }
 
   &:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    // 4. On hover, show the glowing border
+    &::before {
+      opacity: 1;
+    }
   }
 }
 
+.card-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
 .card-date {
-  color: #a0aec0;
+  color: #8b949e;
   font-size: 0.9rem;
   display: block;
   margin-bottom: 10px;
@@ -183,13 +216,13 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
 .card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #e6edf3;
   margin: 0 0 10px 0;
 }
 
 .card-description {
   font-size: 1rem;
-  color: #a0aec0;
+  color: #8b949e;
   flex-grow: 1;
   line-height: 1.6;
 }
@@ -208,7 +241,6 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
 }
 
 .news-card:hover .card-footer {
-  color: #82c0ff;
   .el-icon {
     transform: translateX(5px);
   }
@@ -218,5 +250,4 @@ import { ArrowRightBold } from '@element-plus/icons-vue';
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 </style>
