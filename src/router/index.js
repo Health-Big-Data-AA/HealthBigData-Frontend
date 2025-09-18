@@ -1,58 +1,107 @@
-// src/router/index.js
-
 import { createRouter, createWebHistory } from 'vue-router'
-import MainLayout from '../layouts/MainLayout.vue'
+import { ElMessage } from 'element-plus'
+
+// Import new LandingView
+import LandingView from '../views/LandingView.vue'
 import LoginView from '../views/LoginView.vue'
+import MainLayout from '../layouts/MainLayout.vue'
+import Dashboard from '../views/DashboardView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
+// import RoleManagementView from '../views/RoleManagementView.vue';
+// import TagManagementView from '../views/TagManagementView.vue';
+// import AboutView from '../views/AboutView.vue'
+// import DataManagementView from '../views/DataManagementView.vue'
+// import StatisticsView from '../views/StatisticsView.vue';
+// import LogAuditView from '../views/LogAuditView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // 1. 登录页，无布局
-    {
-      path: '/login', // 假设你的登录页路由
-      name: 'login',
-      component: () => import('@/views/LoginView.vue')
-    },
-    // 2. 主应用，有MainLayout布局
+    // 1. New Landing Page at root
     {
       path: '/',
+      name: 'landing',
+      component: LandingView,
+    },
+    // 2. Login page, no layout
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
+    },
+    // 3. Main application after login
+    {
+      path: '/app', // Changed base path for main app
       component: MainLayout,
-      redirect: '/home',
+      redirect: '/app/dashboard', // Redirect to dashboard by default
       children: [
         {
-          path: 'home', // 默认子路由
-          name: 'home',
-          component: () => import('@/views/HomeView.vue')
+          path: 'dashboard', // Changed path to /app/dashboard
+          name: 'dashboard',
+          component: Dashboard,
+          meta: { requiresAuth: true, title: '仪表盘' }
         },
         {
           path: 'users',
           name: 'users',
-          component: () => import('@/views/UserManagementView.vue')
+          component: UserManagementView,
+          meta: { requiresAuth: true, title: '用户管理' }
         },
-
-
-      ]
+        // {
+        //   path: 'roles',
+        //   name: 'roles',
+        //   component: RoleManagementView,
+        //   meta: { requiresAuth: true, title: '角色管理' }
+        // },
+        // {
+        //   path: 'tags',
+        //   name: 'tags',
+        //   component: TagManagementView,
+        //   meta: { requiresAuth: true, title: '标签管理' }
+        // },
+        // {
+        //   path: 'statistics',
+        //   name: 'statistics',
+        //   component: StatisticsView,
+        //   meta: { requiresAuth: true, title: '统计分析' }
+        // },
+        // {
+        //   path: 'data',
+        //   name: 'data',
+        //   component: DataManagementView,
+        //   meta: { requiresAuth: true, title: '数据管理' }
+        // },
+        // {
+        //   path: 'logs',
+        //   name: 'logs',
+        //   component: LogAuditView,
+        //   meta: { requiresAuth: true, title: '日志审计' }
+        // },
+        // {
+        //   path: 'about',
+        //   name: 'about',
+        //   component: AboutView,
+        //   meta: { requiresAuth: true, title: '关于' }
+        // },
+      ],
     },
-  ]
+  ],
 })
 
-// *** 添加全局前置守卫 ***
+// Navigation Guard
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!localStorage.getItem('user-token');
+  // Allow access to public pages like landing and login
+  if (to.name === 'landing' || to.name === 'login') {
+    return next();
+  }
 
-  // 如果目标路由不是登录页，并且用户未认证，则重定向到登录页
-  if (to.name !== 'login' && !isAuthenticated) {
-    next({ name: 'login' });
+  const loggedIn = !!localStorage.getItem('user-token');
+  if (!loggedIn && to.meta.requiresAuth) {
+    ElMessage.warning('请先登录');
+    return next({ name: 'login' });
   }
-  // 如果用户已认证，并且尝试访问登录页，则重定向到首页
-  else if (isAuthenticated && to.name === 'login') {
-    next({ name: 'home' });
-  }
-  // 其他情况，正常放行
-  else {
-    next();
-  }
+
+  next();
 });
 
 export default router

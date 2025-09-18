@@ -73,8 +73,9 @@
 import { ref, onMounted, reactive } from 'vue';
 import { User, Files, CirclePlus, Finished } from '@element-plus/icons-vue';
 import BaseChart from '@/components/BaseChart.vue';
+import { getDashboardSummary } from '@/api/dashboard.js'; // 引入真实的 API 请求
+
 // --- 响应式数据 ---
-// 顶部面板数据
 const panelData = reactive({
   totalUsers: 0,
   totalRecords: 0,
@@ -82,43 +83,29 @@ const panelData = reactive({
   pendingLogs: 0
 });
 
-// 趋势图 ECharts 配置
 const dailyTrendOption = ref({});
 
 // --- 方法 ---
 const fetchData = () => {
-  // **API 调用**: getDashboardData().then(response => { ... });
-  // 模拟从后端一次性获取所有数据
-  setTimeout(() => {
-    const mockData = {
-      panelData: {
-        totalUsers: 128,
-        totalRecords: 1530,
-        todayNewRecords: 22,
-        pendingLogs: 3
-      },
-      trendData: {
-        dates: ['2025-09-10', '2025-09-11', '2025-09-12', '2025-09-13', '2025-09-14', '2025-09-15', '2025-09-16'],
-        counts: [15, 8, 20, 18, 25, 22, 19]
-      }
-    };
+  // 调用真实的后端接口
+  getDashboardSummary().then(response => {
+    const data = response.data;
 
     // 更新面板数据
-    Object.assign(panelData, mockData.panelData);
+    Object.assign(panelData, data.panelData);
 
     // 更新图表配置
     dailyTrendOption.value = {
       tooltip: { trigger: 'axis' },
-      xAxis: { type: 'category', data: mockData.trendData.dates, boundaryGap: false, },
+      xAxis: { type: 'category', data: data.trendData.dates, boundaryGap: false },
       yAxis: { type: 'value' },
       grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
       series: [{
         name: '新增数量',
-        data: mockData.trendData.counts,
+        data: data.trendData.counts,
         type: 'line',
         smooth: true,
         areaStyle: {
-          // 渐变色
           color: {
             type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
             colorStops: [{ offset: 0, color: 'rgba(58,132,255,0.5)' }, { offset: 1, color: 'rgba(58,132,255,0.1)' }]
@@ -126,8 +113,9 @@ const fetchData = () => {
         }
       }]
     };
-
-  }, 300); // 模拟网络延迟
+  }).catch(error => {
+    console.error("获取仪表盘数据失败:", error);
+  });
 };
 
 onMounted(() => {
