@@ -30,7 +30,7 @@
     <div class="header-right">
       <el-dropdown v-if="userStore.token" trigger="click">
         <span class="user-profile">
-          <el-avatar :size="32" class="user-avatar">{{ userStore.name.charAt(0).toUpperCase() }}</el-avatar>
+          <el-avatar :size="32" :src="userStore.avatarUrl" class="user-avatar">{{ userStore.name.charAt(0).toUpperCase() }}</el-avatar>
           <span class="user-name">{{ userStore.name }}</span>
           <el-icon class="el-icon--right"><arrow-down /></el-icon>
         </span>
@@ -41,6 +41,7 @@
           </el-dropdown-menu>
         </template>
       </el-dropdown>
+
       <el-button v-else type="primary" plain @click="goTo('/login')">登录 / 注册</el-button>
     </div>
   </header>

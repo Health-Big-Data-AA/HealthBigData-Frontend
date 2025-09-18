@@ -87,17 +87,18 @@
   </PageContainer>
 </template>
 
+// src/views/AccountView.vue
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useUserStore } from '@/stores/user';
-import { getAccountInfo, updateAccountInfo, requestPasswordChangeCode, changePassword, uploadAvatar } from '@/api/account.js';
+import { getAccountInfo, updateAccountInfo, requestPasswordChangeCode, changePassword } from '@/api/account.js';
 import PageContainer from '@/components/PageContainer.vue';
 import { CameraFilled, User, Lock, SwitchButton, ArrowRight } from '@element-plus/icons-vue';
 
 const router = useRouter();
-const userStore = useUserStore();
+const userStore = useUserStore(); // 引入 userStore
 
 const userInfo = ref(null);
 const profileFormRef = ref(null);
@@ -149,6 +150,7 @@ const handleGetCode = async () => {
     await requestPasswordChangeCode();
     ElMessage.success('验证码已发送，请检查邮箱');
     let count = 60;
+    codeButtonText.value = `${count}秒后重试`;
     const timer = setInterval(() => {
       count--;
       if (count > 0) {
@@ -195,8 +197,15 @@ const beforeAvatarUpload = (rawFile) => {
   return true;
 };
 
+// --- 【重大修改】上传成功后，调用 store action 更新全局状态 ---
 const handleAvatarSuccess = (response) => {
-  userInfo.value.avatarUrl = response.data;
+  const newAvatarUrl = response.data;
+  // 调用 store 的 action 来更新全局的 avatarUrl
+  userStore.setAvatar(newAvatarUrl);
+  // 同时更新本地页面的 userInfo，以确保立即响应
+  if (userInfo.value) {
+    userInfo.value.avatarUrl = newAvatarUrl;
+  }
   ElMessage.success('头像上传成功!');
 };
 

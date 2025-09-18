@@ -10,6 +10,8 @@ export const useUserStore = defineStore('user', {
     return {
       token: getStorage('user-token') || '',
       name: getStorage('user-name') || '',
+      // --- 新增: 从本地存储读取头像链接 ---
+      avatarUrl: getStorage('user-avatar') || '',
       roles: rolesRaw ? JSON.parse(rolesRaw) : [],
     }
   },
@@ -22,13 +24,15 @@ export const useUserStore = defineStore('user', {
           this.token = data.token
           this.name = data.userName
           this.roles = data.roles
+          // --- 新增: 从登录响应中获取并存储头像链接 ---
+          this.avatarUrl = data.avatarUrl
 
           setStorage('user-token', data.token)
           setStorage('user-name', data.userName)
           setStorage('user-roles', JSON.stringify(data.roles))
+          // --- 新增: 将头像链接存入本地存储 ---
+          setStorage('user-avatar', data.avatarUrl)
 
-          // --- MODIFICATION HERE ---
-          // Redirect to the landing page, which now acts as the main hub
           router.push({ path: '/' });
           resolve()
         }).catch(error => {
@@ -42,13 +46,23 @@ export const useUserStore = defineStore('user', {
         this.token = ''
         this.roles = []
         this.name = ''
+        // --- 新增: 登出时清除头像链接 ---
+        this.avatarUrl = ''
         delStorage('user-token')
         delStorage('user-name')
         delStorage('user-roles')
-        // On logout, always go to the public landing page
+        // --- 新增: 从本地存储中删除头像链接 ---
+        delStorage('user-avatar')
+
         router.push('/');
         resolve()
       })
+    },
+
+    // --- 新增: 一个专门用来更新头像的 action ---
+    setAvatar(avatarUrl) {
+      this.avatarUrl = avatarUrl;
+      setStorage('user-avatar', avatarUrl);
     },
 
     hasPermission(requiredRoles) {
