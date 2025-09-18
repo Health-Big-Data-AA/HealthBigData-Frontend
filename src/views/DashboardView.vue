@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <el-row :gutter="20" class="panel-group">
-      <el-col :lg="6" :sm="12" class="card-panel-col">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/users')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-user">
@@ -15,7 +15,7 @@
         </el-card>
       </el-col>
 
-      <el-col :lg="6" :sm="12" class="card-panel-col">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/data')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-data">
@@ -29,7 +29,7 @@
         </el-card>
       </el-col>
 
-      <el-col :lg="6" :sm="12" class="card-panel-col">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/data')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-today">
@@ -43,7 +43,7 @@
         </el-card>
       </el-col>
 
-      <el-col :lg="6" :sm="12" class="card-panel-col">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/logs')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-audit">
@@ -58,11 +58,17 @@
       </el-col>
     </el-row>
 
-    <el-row style="margin-top: 20px;">
-      <el-col :span="24">
+    <el-row :gutter="20" style="margin-top: 20px;">
+      <el-col :lg="16" :sm="24">
         <el-card>
           <template #header>近7日数据新增趋势</template>
           <BaseChart :option="dailyTrendOption" height="350px"/>
+        </el-card>
+      </el-col>
+      <el-col :lg="8" :sm="24">
+        <el-card>
+          <template #header>记录类型分布</template>
+          <BaseChart :option="pieChartOption" height="350px"/>
         </el-card>
       </el-col>
     </el-row>
@@ -71,11 +77,15 @@
 
 <script setup>
 import { ref, onMounted, reactive } from 'vue';
+import { useRouter } from 'vue-router'; // Import useRouter
 import { User, Files, CirclePlus, Finished } from '@element-plus/icons-vue';
 import BaseChart from '@/components/BaseChart.vue';
-import { getDashboardSummary } from '@/api/dashboard.js'; // 引入真实的 API 请求
+import { getDashboardSummary } from '@/api/dashboard.js';
 
-// --- 响应式数据 ---
+// --- Router ---
+const router = useRouter(); // Initialize router
+
+// --- Reactive Data ---
 const panelData = reactive({
   totalUsers: 0,
   totalRecords: 0,
@@ -84,17 +94,17 @@ const panelData = reactive({
 });
 
 const dailyTrendOption = ref({});
+const pieChartOption = ref({}); // New: For pie chart
 
-// --- 方法 ---
+// --- Methods ---
 const fetchData = () => {
-  // 调用真实的后端接口
   getDashboardSummary().then(response => {
     const data = response.data;
 
-    // 更新面板数据
+    // Update panel data
     Object.assign(panelData, data.panelData);
 
-    // 更新图表配置
+    // Update trend chart option
     dailyTrendOption.value = {
       tooltip: { trigger: 'axis' },
       xAxis: { type: 'category', data: data.trendData.dates, boundaryGap: false },
@@ -108,14 +118,64 @@ const fetchData = () => {
         areaStyle: {
           color: {
             type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-            colorStops: [{ offset: 0, color: 'rgba(58,132,255,0.5)' }, { offset: 1, color: 'rgba(58,132,255,0.1)' }]
+            colorStops: [{ offset: 0, color: 'rgba(58,132,255,0.5)' }, {
+              offset: 1,
+              color: 'rgba(58,132,255,0.1)'
+            }]
           }
         }
       }]
     };
+
+    // New: Process and set pie chart option
+    const pieData = Object.entries(data.recordTypeDistribution).map(([name, value]) => ({
+      name,
+      value
+    }));
+
+    pieChartOption.value = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)'
+      },
+      legend: {
+        orient: 'vertical',
+        left: 10,
+        data: pieData.map(item => item.name)
+      },
+      series: [
+        {
+          name: '记录类型',
+          type: 'pie',
+          radius: ['50%', '70%'],
+          avoidLabelOverlap: false,
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '20',
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data: pieData
+        }
+      ]
+    };
+
   }).catch(error => {
     console.error("获取仪表盘数据失败:", error);
   });
+};
+
+// New: Navigation method
+const goTo = (path) => {
+  router.push(path);
 };
 
 onMounted(() => {
@@ -127,13 +187,15 @@ onMounted(() => {
 .dashboard-container {
   padding: 20px;
 }
+
 .panel-group {
   .card-panel-col {
     margin-bottom: 20px;
+    cursor: pointer; /* Add pointer cursor to indicate clickable */
   }
+
   .card-panel {
     height: 108px;
-    cursor: pointer;
     font-size: 12px;
     position: relative;
     overflow: hidden;
@@ -146,19 +208,24 @@ onMounted(() => {
       padding: 16px;
       transition: all 0.38s ease-out;
       border-radius: 6px;
+
       .el-icon {
         font-size: 48px;
       }
     }
+
     .icon-user {
       color: #40c9c6;
     }
+
     .icon-data {
       color: #36a3f7;
     }
+
     .icon-today {
       color: #f4516c;
     }
+
     .icon-audit {
       color: #34bfa3
     }
@@ -166,6 +233,7 @@ onMounted(() => {
     &:hover {
       .card-panel-icon-wrapper {
         transform: scale(1.1);
+        background: #f2f6fc;
       }
     }
 
@@ -173,17 +241,25 @@ onMounted(() => {
       font-weight: bold;
       margin: 0 26px;
       text-align: right;
+
       .card-panel-text {
         line-height: 18px;
         color: rgba(0, 0, 0, 0.45);
         font-size: 16px;
         margin-bottom: 12px;
       }
+
       .el-statistic {
-        // 覆盖 element-plus 的默认样式
         --el-statistic-content-font-size: 20px;
       }
     }
+  }
+}
+
+// Adjust layout for chart row on smaller screens
+.el-row {
+  .el-col {
+    margin-bottom: 20px;
   }
 }
 </style>

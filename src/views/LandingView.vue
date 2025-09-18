@@ -1,67 +1,70 @@
 <template>
-  <div class="landing-container">
-    <div class="background-overlay"></div>
-
-    <header class="main-header">
-      <div class="logo">
-        <el-icon><DataAnalysis /></el-icon>
-        <span>智健数据</span>
-      </div>
-      <nav class="main-nav">
-        <el-button type="primary" plain @click="goToLogin">登录 / 注册</el-button>
-      </nav>
-    </header>
+  <div class="page-container">
+    <div class="aurora-background">
+      <div class="aurora aurora-1"></div>
+      <div class="aurora aurora-2"></div>
+      <div class="aurora aurora-3"></div>
+    </div>
 
     <main class="main-content">
       <section class="hero-section">
         <h1 class="hero-title">健康大数据平台</h1>
-        <p class="hero-subtitle">洞察数据价值，赋能智慧医疗</p>
+        <p class="hero-subtitle">洞察数据价值，赋能智慧医疗</p >
       </section>
 
       <section class="news-section">
         <h2 class="section-title">最新资讯</h2>
-        <ul class="news-list">
-          <li class="news-item">
-            <span class="news-date">2025-09-15</span>
-            <span class="news-title">平台 2.0 版本上线，新增高级分析功能</span>
-            <el-icon><ArrowRightBold /></el-icon>
-          </li>
-          <li class="news-item">
-            <span class="news-date">2025-09-02</span>
-            <span class="news-title">与XX医疗中心达成战略合作，共建数据模型</span>
-            <el-icon><ArrowRightBold /></el-icon>
-          </li>
-          <li class="news-item">
-            <span class="news-date">2025-08-21</span>
-            <span class="news-title">安全体系全面升级，通过国家三级等保认证</span>
-            <el-icon><ArrowRightBold /></el-icon>
-          </li>
-        </ul>
+        <div class="news-grid">
+          <div class="news-card">
+            <div class="card-content">
+              <span class="card-date">2025-09-15</span>
+              <h3 class="card-title">平台 2.0 版本上线</h3>
+              <p class="card-description">新增高级分析与可视化功能，提升数据洞察力。</p >
+            </div>
+            <div class="card-footer">
+              <span>查看详情</span>
+              <el-icon><ArrowRightBold /></el-icon>
+            </div>
+          </div>
+          <div class="news-card">
+            <div class="card-content">
+              <span class="card-date">2025-09-02</span>
+              <h3 class="card-title">达成战略合作</h3>
+              <p class="card-description">与XX医疗中心携手，共建新一代健康数据模型。</p >
+            </div>
+            <div class="card-footer">
+              <span>查看详情</span>
+              <el-icon><ArrowRightBold /></el-icon>
+            </div>
+          </div>
+          <div class="news-card">
+            <div class="card-content">
+              <span class="card-date">2025-08-21</span>
+              <h3 class="card-title">安全体系升级</h3>
+              <p class="card-description">全面通过国家三级等保认证，保障数据安全。</p >
+            </div>
+            <div class="card-footer">
+              <span>查看详情</span>
+              <el-icon><ArrowRightBold /></el-icon>
+            </div>
+          </div>
+        </div>
       </section>
     </main>
   </div>
 </template>
 
-<script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { DataAnalysis, ArrowRightBold } from '@element-plus/icons-vue';
-
-const router = useRouter();
-
-const goToLogin = () => {
-  router.push('/login');
-};
+<script setup>
+import { ArrowRightBold } from '@element-plus/icons-vue';
+// Note: AppHeader is no longer imported here. It's handled globally in App.vue
 </script>
 
-<style scoped>
-.landing-container {
-  height: 100vh;
-  width: 100vw;
-  background-color: #0b0f19;
-  display: flex;
-  flex-direction: column;
-  color: #fff;
-  overflow-x: hidden;
+<style lang="scss" scoped>
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden; // Hide the parts of aurora that go off-screen
   animation: fadeIn 1s ease-in-out;
 }
 
@@ -70,52 +73,39 @@ const goToLogin = () => {
   to { opacity: 1; }
 }
 
-.background-overlay {
+/* --- Aurora Background --- */
+.aurora-background {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(ellipse at top, #1b2735 0%, #090a0f 100%);
+  right: 0;
+  bottom: 0;
   z-index: 1;
 }
+.aurora {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.25;
+}
+.aurora-1 { width: 600px; height: 600px; background: #0077ff; top: -25%; left: -15%; animation: move-aurora 20s infinite alternate; }
+.aurora-2 { width: 500px; height: 500px; background: #ff3c78; bottom: -30%; right: -20%; animation: move-aurora 25s infinite alternate-reverse; }
+.aurora-3 { width: 400px; height: 400px; background: #39ff14; bottom: 10%; right: 25%; animation: move-aurora 15s infinite alternate; }
 
-.main-header, .main-content {
+@keyframes move-aurora {
+  from { transform: translate(0, 0) rotate(0deg) scale(1); }
+  to { transform: translate(100px, 50px) rotate(180deg) scale(1.2); }
+}
+
+/* --- Main Content --- */
+.main-content {
   position: relative;
   z-index: 2;
   width: 100%;
-  padding-left: max(5vw, 20px);
-  padding-right: max(5vw, 20px);
+  padding: 80px max(5vw, 20px) 40px;
   box-sizing: border-box;
-}
-
-.main-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  background-color: rgba(11, 15, 25, 0.5);
-  backdrop-filter: blur(8px);
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.logo .el-icon {
-  margin-right: 10px;
-  color: #00bcd4;
-}
-
-.main-content {
-  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   text-align: center;
 }
@@ -123,7 +113,105 @@ const goToLogin = () => {
 .hero-section {
   animation: fadeInUp 1s ease-in-out 0.5s forwards;
   opacity: 0;
-  margin-bottom: 4rem;
+  margin-bottom: 5rem;
+}
+
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  background: linear-gradient(90deg, #ffffff, #bbbbbb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: #a0aec0;
+  margin-bottom: 3rem;
+}
+
+.news-section {
+  width: 100%;
+  max-width: 1200px;
+  animation: fadeInUp 1s ease-in-out 0.8s forwards;
+  opacity: 0;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+/* --- News Card Styling --- */
+.news-card {
+  background: rgba(30, 36, 50, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 25px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.card-date {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin: 0 0 10px 0;
+}
+
+.card-description {
+  font-size: 1rem;
+  color: #a0aec0;
+  flex-grow: 1;
+  line-height: 1.6;
+}
+
+.card-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #58a6ff;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  .el-icon {
+    transition: transform 0.3s ease;
+  }
+}
+
+.news-card:hover .card-footer {
+  color: #82c0ff;
+  .el-icon {
+    transform: translateX(5px);
+  }
 }
 
 @keyframes fadeInUp {
@@ -131,72 +219,4 @@ const goToLogin = () => {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.hero-title {
-  font-size: 3.8rem;
-  font-weight: 700;
-  color: #ffffff;
-  margin-bottom: 1rem;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  color: #a0aec0;
-  margin-bottom: 3rem;
-}
-
-.news-section {
-  width: 100%;
-  max-width: 800px;
-  animation: fadeInUp 1s ease-in-out 0.8s forwards;
-  opacity: 0;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #e2e8f0;
-  margin-bottom: 1.5rem;
-  text-align: left;
-}
-
-.news-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-}
-
-.news-item {
-  display: flex;
-  align-items: center;
-  padding: 20px 15px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.news-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-}
-
-.news-date {
-  color: #a0aec0;
-  font-size: 0.9rem;
-  width: 120px;
-}
-
-.news-title {
-  flex-grow: 1;
-  color: #e2e8f0;
-  font-size: 1.1rem;
-}
-
-.news-item .el-icon {
-  color: #a0aec0;
-  transition: transform 0.3s ease;
-}
-
-.news-item:hover .el-icon {
-  transform: translateX(5px);
-}
 </style>

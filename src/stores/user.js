@@ -1,3 +1,4 @@
+// src/stores/user.js
 import { defineStore } from 'pinia'
 import { login } from '@/api/auth'
 import { getStorage, setStorage, delStorage } from '@/utils/localStorage'
@@ -5,17 +6,14 @@ import router from '@/router'
 
 export const useUserStore = defineStore('user', {
   state: () => {
-    // 【修改】从 localStorage 读取 roles 时，进行 JSON 解析
     const rolesRaw = getStorage('user-roles');
     return {
       token: getStorage('user-token') || '',
       name: getStorage('user-name') || '',
-      // 如果 rolesRaw 存在，则解析它；否则返回空数组
       roles: rolesRaw ? JSON.parse(rolesRaw) : [],
     }
   },
   actions: {
-    // 登录
     login(userInfo) {
       const { username, password } = userInfo
       return new Promise((resolve, reject) => {
@@ -27,10 +25,11 @@ export const useUserStore = defineStore('user', {
 
           setStorage('user-token', data.token)
           setStorage('user-name', data.userName)
-          // 【修改】存入 localStorage 前，先将 roles 数组 JSON 序列化
           setStorage('user-roles', JSON.stringify(data.roles))
 
-          router.push({ path: '/app/dashboard' });
+          // --- MODIFICATION HERE ---
+          // Redirect to the landing page, which now acts as the main hub
+          router.push({ path: '/' });
           resolve()
         }).catch(error => {
           reject(error)
@@ -38,7 +37,6 @@ export const useUserStore = defineStore('user', {
       })
     },
 
-    // 退出系统
     logout() {
       return new Promise((resolve) => {
         this.token = ''
@@ -47,12 +45,12 @@ export const useUserStore = defineStore('user', {
         delStorage('user-token')
         delStorage('user-name')
         delStorage('user-roles')
-        router.push('/login');
+        // On logout, always go to the public landing page
+        router.push('/');
         resolve()
       })
     },
 
-    // 判断用户是否拥有特定角色 (这个方法现在可以正常工作了)
     hasPermission(requiredRoles) {
       if (this.roles && this.roles.length > 0 && requiredRoles && requiredRoles.length > 0) {
         return this.roles.some(role => requiredRoles.includes(role))
