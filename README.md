@@ -37,3 +37,34 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### 需要修改本地
+
+```sh
+spring:
+  # MySQL 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/你的数据库名?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC
+    username: root（使用的数据库所对应的数据库服务）
+    password: 
+    
+  # 【新增】邮件配置
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 
+    password: 
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+# 日志配置
+logging:
+  level:
+    # 将项目mapper包下的日志级别设为DEBUG，方便在控制台看到执行的SQL语句
+    com.cdut.healthdatabackend.mapper: DEBUG
+```
