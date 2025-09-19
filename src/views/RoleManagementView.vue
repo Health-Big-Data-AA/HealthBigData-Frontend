@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <PageContainer title="角色管理">
     <el-card>
       <el-form :inline="true" style="text-align: right;">
         <el-form-item>
@@ -38,6 +38,7 @@
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="getList"
         @current-change="getList"
+        class="pagination-container"
       />
     </el-card>
 
@@ -74,14 +75,14 @@
       </template>
     </el-dialog>
 
-  </div>
+  </PageContainer>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
+import PageContainer from '@/components/PageContainer.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { listRolesByPage, deleteRole, updateRole, addRole, getRoleById } from '@/api/role.js';
-// 【新增】导入权限相关API
 import { listPermissionsByPage } from '@/api/permission.js';
 import {
   getPermissionsByRoleId,
@@ -89,7 +90,6 @@ import {
   removePermissionFromRole
 } from '@/api/rolePermission.js';
 
-// ... (大部分 <script> 内容不变) ...
 const loading = ref(true);
 const roleList = ref([]);
 const total = ref(0);
@@ -112,12 +112,11 @@ const form = ref({
   roleDescription: ''
 });
 
-// 【新增】分配权限对话框的数据
 const permissionDialog = reactive({
   visible: false,
   roleId: null,
-  allPermissions: [], // 所有权限的列表
-  assignedIds: [] // 某个角色已分配的权限ID列表
+  allPermissions: [],
+  assignedIds: []
 });
 
 const rules = reactive({
@@ -129,36 +128,24 @@ onMounted(() => {
   getList();
 });
 
-// --- 【新增】权限分配相关方法 ---
-
-/** 点击“分配权限”按钮 */
 async function handleAssignPermission(row) {
   permissionDialog.roleId = row.roleId;
-
-  // 1. 获取所有权限列表
   const allPermissionsRes = await listPermissionsByPage({ pageNo: 1, pageSize: 1000 });
   permissionDialog.allPermissions = allPermissionsRes.data;
-
-  // 2. 获取当前角色已分配的权限
   const assignedPermissionsRes = await getPermissionsByRoleId(row.roleId);
   permissionDialog.assignedIds = assignedPermissionsRes.data.map(p => p.permissionId);
-
   permissionDialog.visible = true;
 }
 
-/** 提交权限分配表单 */
 async function submitPermissionForm() {
   const roleId = permissionDialog.roleId;
   const newPermissionIds = new Set(permissionDialog.assignedIds);
-
   const assignedPermissionsRes = await getPermissionsByRoleId(roleId);
   const oldPermissionIds = new Set(assignedPermissionsRes.data.map(p => p.permissionId));
-
   const toAdd = [...newPermissionIds].filter(id => !oldPermissionIds.has(id));
   const toRemove = [...oldPermissionIds].filter(id => !newPermissionIds.has(id));
 
   try {
-    // 并行执行所有分配和移除操作
     await Promise.all([
       ...toAdd.map(permissionId => assignPermissionToRole({ roleId, permissionId })),
       ...toRemove.map(permissionId => removePermissionFromRole({ roleId, permissionId }))
@@ -169,9 +156,6 @@ async function submitPermissionForm() {
     ElMessage.error("权限分配失败");
   }
 }
-
-
-// --- 原有角色管理方法 (基本不变) ---
 
 function getList() {
   loading.value = true;
@@ -220,8 +204,7 @@ function handleDelete(row) {
   }).then(() => {
     getList();
     ElMessage.success("删除成功");
-  }).catch(() => {
-  });
+  }).catch(() => {});
 }
 
 function cancel() {
@@ -250,8 +233,36 @@ function submitForm() {
 }
 </script>
 
-<style scoped>
-.app-container {
-  padding: 20px;
+<style scoped lang="scss">
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+:deep(.el-card) {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+}
+:deep(.el-table) {
+  background-color: transparent;
+  --el-table-border-color: #30363d;
+  --el-table-header-bg-color: transparent;
+  --el-table-header-text-color: #a7b1c2;
+  --el-table-tr-bg-color: transparent;
+  --el-table-row-hover-bg-color: rgba(255, 255, 255, 0.05);
+  --el-table-text-color: #c9d1d9;
+}
+:deep(.el-table th.el-table__cell) {
+  background-color: transparent;
+}
+:deep(.el-table tr) {
+  background-color: transparent;
+}
+:deep(.el-pagination) {
+  --el-pagination-bg-color: transparent;
+  --el-pagination-text-color: #a7b1c2;
+  --el-pagination-button-bg-color: transparent;
+  --el-pagination-button-disabled-bg-color: transparent;
 }
 </style>

@@ -126,4 +126,49 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
 }
+
+// 深度选择器 :deep() 用于覆盖 Element Plus 组件的内部样式
+:deep(.el-card) {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+}
+
+:deep(.el-form-item__label) {
+  color: #a7b1c2;
+}
+
+:deep(.el-input__wrapper),
+:deep(.el-select__wrapper) {
+  background-color: rgba(30, 36, 50, 0.8) !important;
+  box-shadow: none !important;
+  border: 1px solid #30363d;
+}
+
+:deep(.el-input__inner) {
+  color: #e6edf3 !important;
+}
+
+:deep(.el-table) {
+  background-color: transparent;
+  --el-table-border-color: #30363d;
+  --el-table-header-bg-color: transparent;
+  --el-table-header-text-color: #a7b1c2;
+  --el-table-tr-bg-color: transparent;
+  --el-table-row-hover-bg-color: rgba(255, 255, 255, 0.05);
+  --el-table-text-color: #c9d1d9;
+}
+:deep(.el-table th.el-table__cell) {
+  background-color: transparent;
+}
+:deep(.el-table tr) {
+  background-color: transparent;
+}
+
+:deep(.el-pagination) {
+  --el-pagination-bg-color: transparent;
+  --el-pagination-text-color: #a7b1c2;
+  --el-pagination-button-bg-color: transparent;
+  --el-pagination-button-disabled-bg-color: transparent;
+}
 </style>

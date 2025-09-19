@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container">
+  <PageContainer title="数据管理">
     <el-card>
       <el-row :gutter="10" class="action-buttons">
         <el-col :span="1.5">
@@ -7,7 +7,7 @@
             :action="uploadUrl"
             :headers="uploadHeaders"
             :show-file-list="false"
-            accept=".xlsx, .xls, .csv"
+            accept=".xlsx, .xls"
             :on-success="handleUploadSuccess"
             :on-error="handleUploadError"
             :before-upload="handleBeforeUpload"
@@ -44,19 +44,20 @@
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="getList"
         @current-change="getList"
+        class="pagination-container"
       />
     </el-card>
-  </div>
+  </PageContainer>
 </template>
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue';
+import PageContainer from '@/components/PageContainer.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { listRecordsByPage, exportRecords } from '@/api/patientRecord.js';
 import { cleanseData, deduplicateData } from '@/api/dataManagement.js';
 import { getStorage } from '@/utils/localStorage';
 
-// --- 响应式数据 ---
 const loading = ref(true);
 const exportLoading = ref(false);
 const cleanseLoading = ref(false);
@@ -69,19 +70,15 @@ const queryParams = reactive({
   pageSize: 10,
 });
 
-// --- 上传配置 ---
-const uploadUrl = ref('/api/api/records/import'); // 拼接 /api 是因为 vite.config.js 的代理
+const uploadUrl = ref('/api/api/records/import');
 const uploadHeaders = computed(() => ({
   Authorization: 'Bearer ' + getStorage('user-token')
 }));
 
-
-// --- 生命周期钩子 ---
 onMounted(() => {
   getList();
 });
 
-// --- 主要方法 ---
 function getList() {
   loading.value = true;
   listRecordsByPage(queryParams).then(response => {
@@ -91,30 +88,23 @@ function getList() {
   });
 }
 
-// --- 上传相关方法 ---
 function handleBeforeUpload(file) {
   const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
   const isLt10M = file.size / 1024 / 1024 < 10;
-
-  if (!isExcel) {
-    ElMessage.error('上传文件只能是 Excel 格式!');
-  }
-  if (!isLt10M) {
-    ElMessage.error('上传文件大小不能超过 10MB!');
-  }
+  if (!isExcel) ElMessage.error('上传文件只能是 Excel 格式!');
+  if (!isLt10M) ElMessage.error('上传文件大小不能超过 10MB!');
   return isExcel && isLt10M;
 }
 
-function handleUploadSuccess(response, file) {
+function handleUploadSuccess(response) {
   ElMessage.success(response.data || '数据导入成功！');
-  getList(); // 刷新列表
+  getList();
 }
 
-function handleUploadError(error) {
+function handleUploadError() {
   ElMessage.error('文件上传失败，请检查文件格式或联系管理员！');
 }
 
-// --- 导出方法 ---
 function handleExport() {
   ElMessageBox.confirm('您确定要导出所有患者记录吗？', '提示', {
     confirmButtonText: '确定',
@@ -123,7 +113,6 @@ function handleExport() {
   }).then(() => {
     exportLoading.value = true;
     exportRecords().then(response => {
-      // 从响应头中获取文件名
       const contentDisposition = response.headers['content-disposition'];
       let fileName = 'patient_records.xlsx';
       if (contentDisposition) {
@@ -131,7 +120,6 @@ function handleExport() {
         if (fileNameMatch && fileNameMatch.length === 2)
           fileName = fileNameMatch[1];
       }
-      // 创建一个下载链接并模拟点击
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -140,14 +128,12 @@ function handleExport() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      exportLoading.value = false;
-    }).catch(() => {
+    }).finally(() => {
       exportLoading.value = false;
     });
   }).catch(() => {});
 }
 
-// --- 数据处理方法 ---
 function handleCleanse() {
   cleanseLoading.value = true;
   cleanseData().then(response => {
@@ -160,10 +146,9 @@ function handleCleanse() {
       '数据清洗报告',
       { dangerouslyUseHTMLString: true }
     );
+  }).finally(() => {
     cleanseLoading.value = false;
-    getList(); // 清洗后可能数据有变，刷新列表
-  }).catch(() => {
-    cleanseLoading.value = false;
+    getList();
   });
 }
 
@@ -179,19 +164,46 @@ function handleDeduplicate() {
       '数据去重报告',
       { dangerouslyUseHTMLString: true }
     );
+  }).finally(() => {
     deduplicateLoading.value = false;
-    getList(); // 去重后数据肯定有变，刷新列表
-  }).catch(() => {
-    deduplicateLoading.value = false;
+    getList();
   });
 }
 </script>
 
-<style scoped>
-.app-container {
-  padding: 20px;
-}
+<style scoped lang="scss">
 .action-buttons {
   margin-bottom: 20px;
+}
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+:deep(.el-card) {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  color: #c9d1d9;
+}
+:deep(.el-table) {
+  background-color: transparent;
+  --el-table-border-color: #30363d;
+  --el-table-header-bg-color: transparent;
+  --el-table-header-text-color: #a7b1c2;
+  --el-table-tr-bg-color: transparent;
+  --el-table-row-hover-bg-color: rgba(255, 255, 255, 0.05);
+  --el-table-text-color: #c9d1d9;
+}
+:deep(.el-table th.el-table__cell) {
+  background-color: transparent;
+}
+:deep(.el-table tr) {
+  background-color: transparent;
+}
+:deep(.el-pagination) {
+  --el-pagination-bg-color: transparent;
+  --el-pagination-text-color: #a7b1c2;
+  --el-pagination-button-bg-color: transparent;
+  --el-pagination-button-disabled-bg-color: transparent;
 }
 </style>

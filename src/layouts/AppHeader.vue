@@ -18,6 +18,7 @@
         router
         class="top-menu"
       >
+        <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/dashboard">仪表盘</el-menu-item>
         <el-menu-item index="/users">用户管理</el-menu-item>
         <el-menu-item index="/roles">角色管理</el-menu-item>
@@ -60,7 +61,6 @@ const goTo = (path) => {
   router.push(path);
 };
 
-// The logo now always takes you to the main landing page
 const goHome = () => {
   router.push('/');
 }
@@ -91,13 +91,10 @@ const handleLogout = () => {
   z-index: 100;
   width: 100%;
   box-sizing: border-box;
-
-  // --- Linear Style Redesign ---
-  background-color: rgba(18, 24, 38, 0.7); // Darker, more integrated background
+  background-color: rgba(18, 24, 38, 0.7);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1); // Thin stroke
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
-  // Top glowing line
   &::before {
     content: '';
     position: absolute;
