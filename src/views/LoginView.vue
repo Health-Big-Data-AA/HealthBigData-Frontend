@@ -42,6 +42,7 @@
           <el-form ref="registerFormRef" :model="registerForm" :rules="registerRules" label-width="0px">
             <el-form-item prop="userName"><el-input v-model="registerForm.userName" placeholder="设置用户名" :prefix-icon="User" size="large" /></el-form-item>
             <el-form-item prop="email"><el-input v-model="registerForm.email" placeholder="输入QQ邮箱" :prefix-icon="Message" size="large" /></el-form-item>
+            <el-form-item prop="phoneNumber"><el-input v-model="registerForm.phoneNumber" placeholder="输入手机号码" :prefix-icon="Phone" size="large" /></el-form-item>
             <el-form-item prop="password"><el-input v-model="registerForm.password" type="password" placeholder="设置密码" :prefix-icon="Lock" size="large" show-password /></el-form-item>
             <el-form-item prop="confirmPassword"><el-input v-model="registerForm.confirmPassword" type="password" placeholder="确认密码" :prefix-icon="Lock" size="large" show-password /></el-form-item>
             <el-form-item prop="verificationCode">
@@ -79,6 +80,7 @@
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
+// [新增] 导入手机图标
 import { User, Lock, Key, Message, Phone, ArrowLeftBold } from '@element-plus/icons-vue';
 import { useUserStore } from '@/stores/user';
 import { login, getRegisterCode, register, getPasswordResetCode, resetPassword } from '@/api/auth';
@@ -114,6 +116,11 @@ const registerRules = reactive({
   email: [
     { required: true, message: '邮箱不能为空', trigger: 'blur' },
     { pattern: /^[1-9][0-9]{4,9}@qq\.com$/, message: '请输入有效的QQ邮箱地址', trigger: 'blur' }
+  ],
+  // [新增] 手机号的验证规则
+  phoneNumber: [
+    { required: true, message: '手机号不能为空', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的11位手机号码', trigger: 'blur' }
   ],
   password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
   confirmPassword: [{ required: true, validator: validatePass, trigger: 'blur' }],
