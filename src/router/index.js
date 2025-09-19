@@ -8,10 +8,10 @@ import DashboardView from '../views/DashboardView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
 import RoleManagementView from '../views/RoleManagementView.vue'
 import DataManagementView from '../views/DataManagementView.vue'
-// import TagManagementView from '../views/TagManagementView.vue'
+// [新增] 导入新创建的权限管理视图
+import PermissionManagementView from '../views/PermissionManagementView.vue'
 import StatisticsView from '../views/StatisticsView.vue'
 import LogAuditView from '../views/LogAuditView.vue'
-// Create a placeholder for the new Account view
 import AccountView from '../views/AccountView.vue'
 
 const router = createRouter({
@@ -29,7 +29,7 @@ const router = createRouter({
       component: LoginView,
     },
 
-    // Authenticated routes - now at the top level
+    // Authenticated routes
     {
       path: '/dashboard',
       name: 'dashboard',
@@ -48,18 +48,19 @@ const router = createRouter({
       component: RoleManagementView,
       meta: { requiresAuth: true, title: '角色管理', roles: ['ADMIN'] }
     },
+    // [新增] 添加权限管理页面的路由规则
+    {
+      path: '/permissions',
+      name: 'permissions',
+      component: PermissionManagementView,
+      meta: { requiresAuth: true, title: '权限管理', roles: ['ADMIN'] }
+    },
     {
       path: '/data',
       name: 'data',
       component: DataManagementView,
       meta: { requiresAuth: true, title: '数据管理' }
     },
-    // {
-    //   path: '/tags',
-    //   name: 'tags',
-    //   component: TagManagementView,
-    //   meta: { requiresAuth: true, title: '标签管理' }
-    // },
     {
       path: '/statistics',
       name: 'statistics',
