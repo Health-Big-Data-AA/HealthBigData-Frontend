@@ -10,7 +10,7 @@ const deepSeekApiClient = axios.create({
 
 export const getAiResponse = (messages, tools) => {
   return deepSeekApiClient.post('/chat/completions', {
-    model: 'deepseek-ai/DeepSeek-V2',
+    model: 'deepseek-ai/DeepSeek-V3',
     messages: messages,
     tools: tools,
     tool_choice: 'auto'
