@@ -27,6 +27,26 @@
       </el-row>
 
       <el-form :model="queryParams" ref="queryForm" :inline="true" class="query-form">
+        <el-form-item label="选择数据集" prop="batchId">
+          <el-select
+            v-model="queryParams.batchId"
+            placeholder="请选择数据集批次"
+            clearable
+            @change="handleSearch"
+            style="width: 300px;"
+          >
+            <el-option label="全部数据" :value="null" />
+            <el-option
+              v-for="batch in batchList"
+              :key="batch.batchId"
+              :label="`批次 ${batch.batchId}: ${batch.originalFilename}`"
+              :value="batch.batchId"
+            >
+              <span style="float: left">{{ `批次 ${batch.batchId}` }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ batch.createTime }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item label="记录类型" prop="recordType">
           <el-input
             v-model="queryParams.recordType"
@@ -112,6 +132,7 @@ import { listRecordsByPage, exportRecords } from '@/api/patientRecord.js';
 import { cleanseData, deduplicateData } from '@/api/dataManagement.js';
 import { getStorage } from '@/utils/localStorage';
 import { getAllTags } from '@/api/tag.js';
+import { getAllBatches } from '@/api/batch.js'; // Import the new API
 import { getTagsByRecordId, addTagToRecord, removeTagFromRecord } from '@/api/patientRecordTag.js';
 import { useRoute } from 'vue-router';
 
@@ -122,11 +143,13 @@ const cleanseLoading = ref(false);
 const deduplicateLoading = ref(false);
 const recordList = ref([]);
 const total = ref(0);
+const batchList = ref([]); // To store the list of data batches
 
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
   recordType: '',
+  batchId: null, // Add batchId for filtering
   orderByColumn: '',
   sortOrder: ''
 });
@@ -146,12 +169,19 @@ const uploadHeaders = computed(() => ({
 }));
 
 onMounted(() => {
+  fetchBatches(); // Fetch batches on component mount
   const recordTypeFromQuery = route.query.recordType;
   if (recordTypeFromQuery) {
     queryParams.recordType = recordTypeFromQuery;
   }
   getList();
 });
+
+function fetchBatches() {
+  getAllBatches().then(response => {
+    batchList.value = response.data;
+  });
+}
 
 function getList() {
   loading.value = true;
@@ -169,6 +199,7 @@ const handleSearch = () => {
 
 const resetQuery = () => {
   queryParams.recordType = '';
+  queryParams.batchId = null;
   handleSearch();
 };
 
@@ -226,6 +257,7 @@ function handleBeforeUpload(file) {
 // 修改成功回调，导入后刷新列表
 function handleUploadSuccess(response) {
   ElMessage.success(response.data || '数据导入成功！');
+  fetchBatches(); // Refresh the batch list after successful upload
   getList();
 }
 
@@ -234,13 +266,14 @@ function handleUploadError() {
 }
 
 function handleExport() {
-  ElMessageBox.confirm('您确定要导出所有患者记录吗？', '提示', {
+  const batchText = queryParams.batchId ? `当前选定的批次 (ID: ${queryParams.batchId})` : '所有';
+  ElMessageBox.confirm(`您确定要导出 ${batchText} 的患者记录吗？`, '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
     exportLoading.value = true;
-    exportRecords().then(response => {
+    exportRecords({ batchId: queryParams.batchId }).then(response => {
       const contentDisposition = response.headers['content-disposition'];
       let fileName = 'patient_records.xlsx';
       if (contentDisposition) {

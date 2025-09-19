@@ -71,10 +71,11 @@ export function importRecords(formData) {
 /**
  * 【新增】将患者记录导出为Excel文件
  */
-export function exportRecords() {
+export function exportRecords(params) {
   return request({
     url: '/api/records/export', // 请求的 URL
     method: 'get',              // 请求方法
-    responseType: 'blob' // 告诉axios期望接收一个二进制文件
+    responseType: 'blob', // 告诉axios期望接收一个二进制文件
+    params // Add batchId for filtering
   });
 }

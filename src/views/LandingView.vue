@@ -10,16 +10,40 @@
       <section class="hero-section">
         <h1 class="hero-title">健康大数据平台</h1>
         <p class="hero-subtitle">洞察数据价值，赋能智慧医疗</p>
+        <div class="search-container">
+          <el-input
+            v-model="searchQuery"
+            placeholder="搜索内容或输入页面名称按回车跳转..."
+            clearable
+            size="large"
+            @keyup.enter="handleSearch"
+          >
+            <template #prefix>
+              <el-icon><Search /></el-icon>
+            </template>
+          </el-input>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2 class="section-title">关于我们</h2>
+        <p class="about-text">
+          我们致力于构建一个高效、安全且功能完善的健康数据统计分析平台。通过整合、分析与可视化健康医疗数据，我们助力医疗科研机构与健康管理部门深度挖掘数据价值，为科研创新与决策支持提供强有力的工具。
+        </p>
       </section>
 
       <ContentRow title="健康资讯">
-        <NewsCard v-for="news in newsItems" :key="news.id" :news="news" />
+        <NewsCard v-for="news in filteredNewsItems" :key="news.id" :news="news" />
+        <p v-if="filteredNewsItems.length === 0" class="no-results">没有找到相关资讯。</p>
       </ContentRow>
 
       <ContentRow title="健康视频">
-        <VideoCard v-for="video in videoItems" :key="video.id" :video="video" @play="playVideo(video.bvid)" />
+        <VideoCard v-for="video in filteredVideoItems" :key="video.id" :video="video" @play="playVideo(video.bvid)" />
+        <p v-if="filteredVideoItems.length === 0" class="no-results">没有找到相关视频。</p>
       </ContentRow>
     </main>
+
+    <AppFooter />
 
     <el-dialog
       v-model="videoPlayer.visible"
@@ -43,15 +67,68 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { Search } from '@element-plus/icons-vue';
 import ContentRow from '@/components/ContentRow.vue';
 import NewsCard from '@/components/NewsCard.vue';
 import VideoCard from '@/components/VideoCard.vue';
+import AppFooter from '@/layouts/AppFooter.vue';
 import { healthNews } from '@/data/newsData.js';
 import { healthVideos } from '@/data/videoData.js';
 
+const router = useRouter();
+const searchQuery = ref('');
 const newsItems = ref(healthNews);
 const videoItems = ref(healthVideos);
+
+const filteredNewsItems = computed(() => {
+  if (!searchQuery.value) {
+    return newsItems.value;
+  }
+  return newsItems.value.filter(news =>
+    news.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
+const filteredVideoItems = computed(() => {
+  if (!searchQuery.value) {
+    return videoItems.value;
+  }
+  return videoItems.value.filter(video =>
+    video.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
+const navigationMap = {
+  '仪表盘': '/dashboard',
+  'dashboard': '/dashboard',
+  '用户管理': '/users',
+  'users': '/users',
+  '角色管理': '/roles',
+  'roles': '/roles',
+  '权限管理': '/permissions',
+  'permissions': '/permissions',
+  '数据管理': '/data',
+  'data': '/data',
+  '标签管理': '/tags',
+  'tags': '/tags',
+  '统计分析': '/statistics',
+  'statistics': '/statistics',
+  '日志审计': '/logs',
+  'logs': '/logs',
+  '账户中心': '/account',
+  'account': '/account',
+  '登录': '/login',
+  'login': '/login',
+};
+
+const handleSearch = () => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (navigationMap[query]) {
+    router.push(navigationMap[query]);
+  }
+};
 
 const videoPlayer = reactive({
   visible: false,
@@ -105,6 +182,41 @@ const playVideo = (bvid) => {
 .hero-subtitle {
   font-size: clamp(1rem, 2vw, 1.25rem);
   color: #a0aec0;
+  margin-bottom: 2rem; /* Add margin to separate from search bar */
+}
+
+.search-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.about-section {
+  max-width: 900px;
+  margin: 0 auto 5rem;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 600;
+  color: #e0e6f1;
+  margin-bottom: 1rem;
+}
+
+.about-text {
+  font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+  color: #a0aec0;
+  line-height: 1.8;
+}
+
+.no-results {
+  color: #a0aec0;
+  width: 100%;
+  text-align: center;
+  padding: 2rem;
 }
 
 @media (max-width: 768px) {
