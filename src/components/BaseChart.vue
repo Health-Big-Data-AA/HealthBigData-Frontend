@@ -22,6 +22,8 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(['chart-click']);
+
 const chartRef = ref(null);
 let chartInstance = null;
 
@@ -30,6 +32,10 @@ const initChart = () => {
   if (chartRef.value) {
     chartInstance = echarts.init(chartRef.value);
     chartInstance.setOption(props.option);
+
+    chartInstance.on('click', (params) => {
+      emit('chart-click', params);
+    });
   }
 };
 

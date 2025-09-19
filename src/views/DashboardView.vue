@@ -68,7 +68,7 @@
       <el-col :lg="8" :sm="24">
         <el-card>
           <template #header>记录类型分布</template>
-          <BaseChart :option="pieChartOption" height="350px"/>
+          <BaseChart :option="pieChartOption" height="350px" @chart-click="handlePieChartClick"/>
         </el-card>
       </el-col>
     </el-row>
@@ -176,6 +176,15 @@ const fetchData = () => {
 // New: Navigation method
 const goTo = (path) => {
   router.push(path);
+};
+
+const handlePieChartClick = (params) => {
+  if (params && params.name) {
+    router.push({
+      path: '/data',
+      query: { recordType: params.name }
+    });
+  }
 };
 
 onMounted(() => {

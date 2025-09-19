@@ -32,6 +32,14 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
+            <div class="card-header">身高-体重相关性</div>
+          </template>
+          <BaseChart :option="correlationScatterOption" height="400px"/>
+        </el-card>
+      </el-col>
+      <el-col :span="12">
+        <el-card class="chart-card">
+          <template #header>
             <div class="card-header">按类型分组对比</div>
           </template>
           <BaseChart :option="groupedBarOption" height="400px"/>
@@ -80,6 +88,7 @@ const correlationData = reactive({
 // ECharts 图表配置
 const groupedBarOption = ref({});
 const trendLineOption = ref({});
+const correlationScatterOption = ref({});
 
 // 获取所有统计数据
 const fetchAllStatistics = async () => {
@@ -97,7 +106,32 @@ const fetchAllStatistics = async () => {
     // 2. 处理相关性分析
     Object.assign(correlationData, correlationRes.data);
 
-    // 3. 处理分组对比数据并生成柱状图配置
+    // 3. 新增：处理相关性数据并生成散点图配置
+    correlationScatterOption.value = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '身高: {c} cm<br/>体重: {c} kg'
+      },
+      xAxis: {
+        name: '身高 (cm)',
+        type: 'value',
+        nameTextStyle: { color: '#ccc' },
+        axisLabel: { color: '#ccc' }
+      },
+      yAxis: {
+        name: '体重 (kg)',
+        type: 'value',
+        nameTextStyle: { color: '#ccc' },
+        axisLabel: { color: '#ccc' }
+      },
+      series: [{
+        symbolSize: 10,
+        data: correlationRes.data.dataPoints,
+        type: 'scatter'
+      }]
+    };
+
+    // 4. 处理分组对比数据并生成柱状图配置
     const groupedData = groupedRes.data;
     groupedBarOption.value = {
       tooltip: { trigger: 'axis' },
@@ -114,7 +148,7 @@ const fetchAllStatistics = async () => {
       ]
     };
 
-    // 4. 处理趋势数据并生成折线图配置
+    // 5. 处理趋势数据并生成折线图配置
     const trendData = trendRes.data.dataPoints;
     trendLineOption.value = {
       tooltip: { trigger: 'axis' },

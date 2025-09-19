@@ -48,6 +48,8 @@
 
       <el-button v-else type="primary" plain @click="goTo('/login')">登录 / 注册</el-button>
 
+      <AiAgent />
+
       <!-- Mobile Menu Icon -->
       <el-icon v-if="userStore.token" class="mobile-menu-icon mobile-only" @click="drawerVisible = true">
         <Menu />
@@ -87,6 +89,7 @@ import { useRouter } from 'vue-router'
 import { DataAnalysis, ArrowDown, Menu } from '@element-plus/icons-vue'
 import { ElMessageBox, ElMessage } from 'element-plus';
 import { useUserStore } from '@/stores/user';
+import AiAgent from '@/components/AiAgent.vue';
 
 const userStore = useUserStore();
 const router = useRouter();

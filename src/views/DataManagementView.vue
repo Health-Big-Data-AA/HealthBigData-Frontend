@@ -26,6 +26,21 @@
         </el-col>
       </el-row>
 
+      <el-form :model="queryParams" ref="queryForm" :inline="true" class="query-form">
+        <el-form-item label="记录类型" prop="recordType">
+          <el-input
+            v-model="queryParams.recordType"
+            placeholder="请输入记录类型"
+            clearable
+            @keyup.enter="handleSearch"
+          />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" icon="Search" @click="handleSearch">搜索</el-button>
+          <el-button icon="Refresh" @click="resetQuery">重置</el-button>
+        </el-form-item>
+      </el-form>
+
       <el-table v-loading="loading" :data="recordList">
         <el-table-column label="记录ID" align="center" prop="recordId" />
         <el-table-column label="患者标识" align="center" prop="patientIdentifier" />
@@ -98,7 +113,9 @@ import { cleanseData, deduplicateData } from '@/api/dataManagement.js';
 import { getStorage } from '@/utils/localStorage';
 import { getAllTags } from '@/api/tag.js';
 import { getTagsByRecordId, addTagToRecord, removeTagFromRecord } from '@/api/patientRecordTag.js';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 const loading = ref(true);
 const exportLoading = ref(false);
 const cleanseLoading = ref(false);
@@ -109,6 +126,7 @@ const total = ref(0);
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
+  recordType: ''
 });
 
 const tagDialog = reactive({
@@ -126,6 +144,10 @@ const uploadHeaders = computed(() => ({
 }));
 
 onMounted(() => {
+  const recordTypeFromQuery = route.query.recordType;
+  if (recordTypeFromQuery) {
+    queryParams.recordType = recordTypeFromQuery;
+  }
   getList();
 });
 
@@ -137,6 +159,16 @@ function getList() {
     loading.value = false;
   });
 }
+
+const handleSearch = () => {
+  queryParams.pageNo = 1;
+  getList();
+};
+
+const resetQuery = () => {
+  queryParams.recordType = '';
+  handleSearch();
+};
 
 async function handleAssignTag(row) {
   tagDialog.recordId = row.recordId;
@@ -256,6 +288,9 @@ function handleDeduplicate() {
 
 <style scoped lang="scss">
 .action-buttons {
+  margin-bottom: 20px;
+}
+.query-form {
   margin-bottom: 20px;
 }
 .tag-item {
