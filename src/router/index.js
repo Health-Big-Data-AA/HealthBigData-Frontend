@@ -9,8 +9,8 @@ import UserManagementView from '../views/UserManagementView.vue'
 import RoleManagementView from '../views/RoleManagementView.vue'
 import DataManagementView from '../views/DataManagementView.vue'
 // import TagManagementView from '../views/TagManagementView.vue'
-// import StatisticsView from '../views/StatisticsView.vue'
-// import LogAuditView from '../views/LogAuditView.vue'
+import StatisticsView from '../views/StatisticsView.vue'
+import LogAuditView from '../views/LogAuditView.vue'
 // Create a placeholder for the new Account view
 import AccountView from '../views/AccountView.vue'
 
@@ -60,18 +60,18 @@ const router = createRouter({
     //   component: TagManagementView,
     //   meta: { requiresAuth: true, title: '标签管理' }
     // },
-    // {
-    //   path: '/statistics',
-    //   name: 'statistics',
-    //   component: StatisticsView,
-    //   meta: { requiresAuth: true, title: '统计分析' }
-    // },
-    // {
-    //   path: '/logs',
-    //   name: 'logs',
-    //   component: LogAuditView,
-    //   meta: { requiresAuth: true, title: '日志审计' }
-    // },
+    {
+      path: '/statistics',
+      name: 'statistics',
+      component: StatisticsView,
+      meta: { requiresAuth: true, title: '统计分析' }
+    },
+    {
+      path: '/logs',
+      name: 'logs',
+      component: LogAuditView,
+      meta: { requiresAuth: true, title: '日志审计' }
+    },
     {
       path: '/account',
       name: 'account',
