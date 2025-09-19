@@ -33,6 +33,17 @@
         <el-table-column label="创建人ID" align="center" prop="createdByUserId" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="180"/>
         <el-table-column label="更新时间" align="center" prop="updateTime" width="180"/>
+        <el-table-column label="已分配标签" align="center" width="200">
+          <template #default="scope">
+            <el-tag
+              v-for="tag in scope.row.tags"
+              :key="tag.tagId"
+              class="tag-item"
+            >
+              {{ tag.tagName }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="120">
           <template #default="scope">
             <el-button type="primary" link icon="PriceTag" @click="handleAssignTag(scope.row)">
@@ -121,8 +132,8 @@ onMounted(() => {
 function getList() {
   loading.value = true;
   listRecordsByPage(queryParams).then(response => {
-    recordList.value = response.data;
-    total.value = response.total;
+    recordList.value = response.data.records; // Access the records array from the page object
+    total.value = response.data.total; // Access the total count from the page object
     loading.value = false;
   });
 }
@@ -152,6 +163,7 @@ async function submitTagForm() {
     ]);
     ElMessage.success("标签分配成功");
     tagDialog.visible = false;
+    getList(); // Refresh the list to show updated tags
   } catch (error) {
     ElMessage.error("标签分配失败");
   }
@@ -245,6 +257,10 @@ function handleDeduplicate() {
 <style scoped lang="scss">
 .action-buttons {
   margin-bottom: 20px;
+}
+.tag-item {
+  margin-right: 5px;
+  margin-bottom: 5px;
 }
 .pagination-container {
   margin-top: 20px;

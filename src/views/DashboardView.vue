@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
     <el-row :gutter="20" class="panel-group">
-      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/users')">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/users')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-user">
@@ -15,7 +15,7 @@
         </el-card>
       </el-col>
 
-      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/data')">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/data')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-data">
@@ -29,7 +29,7 @@
         </el-card>
       </el-col>
 
-      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/data')">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/data')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-today">
@@ -43,7 +43,7 @@
         </el-card>
       </el-col>
 
-      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/app/logs')">
+      <el-col :lg="6" :sm="12" class="card-panel-col" @click="goTo('/logs')">
         <el-card shadow="hover">
           <div class="card-panel">
             <div class="card-panel-icon-wrapper icon-audit">
