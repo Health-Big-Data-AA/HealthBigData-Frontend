@@ -33,6 +33,13 @@
         <el-table-column label="创建人ID" align="center" prop="createdByUserId" />
         <el-table-column label="创建时间" align="center" prop="createTime" width="180"/>
         <el-table-column label="更新时间" align="center" prop="updateTime" width="180"/>
+        <el-table-column label="操作" align="center" width="120">
+          <template #default="scope">
+            <el-button type="primary" link icon="PriceTag" @click="handleAssignTag(scope.row)">
+              分配标签
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <el-pagination
@@ -47,6 +54,27 @@
         class="pagination-container"
       />
     </el-card>
+
+    <el-dialog title="分配标签" v-model="tagDialog.visible" width="600px">
+      <el-select
+        v-model="tagDialog.assignedIds"
+        multiple
+        filterable
+        placeholder="请选择或搜索标签"
+        style="width: 100%"
+      >
+        <el-option
+          v-for="item in tagDialog.allTags"
+          :key="item.tagId"
+          :label="item.tagName"
+          :value="item.tagId"
+        />
+      </el-select>
+      <template #footer>
+        <el-button @click="tagDialog.visible = false">取 消</el-button>
+        <el-button type="primary" @click="submitTagForm">保 存</el-button>
+      </template>
+    </el-dialog>
   </PageContainer>
 </template>
 
@@ -57,6 +85,9 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { listRecordsByPage, exportRecords } from '@/api/patientRecord.js';
 import { cleanseData, deduplicateData } from '@/api/dataManagement.js';
 import { getStorage } from '@/utils/localStorage';
+// [新增] 导入标签相关的API
+import { getAllTags } from '@/api/tag.js';
+import { getTagsByRecordId, addTagToRecord, removeTagFromRecord } from '@/api/patientRecordTag.js';
 
 const loading = ref(true);
 const exportLoading = ref(false);
@@ -68,6 +99,14 @@ const total = ref(0);
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
+});
+
+// [新增] 标签弹窗相关的数据
+const tagDialog = reactive({
+  visible: false,
+  recordId: null,
+  allTags: [],
+  assignedIds: []
 });
 
 const uploadUrl = ref('/api/api/records/import');
@@ -88,6 +127,38 @@ function getList() {
   });
 }
 
+// --- [新增] 标签分配相关方法 ---
+async function handleAssignTag(row) {
+  tagDialog.recordId = row.recordId;
+  const allTagsRes = await getAllTags();
+  tagDialog.allTags = allTagsRes.data;
+  const assignedTagsRes = await getTagsByRecordId(row.recordId);
+  tagDialog.assignedIds = assignedTagsRes.data.map(t => t.tagId);
+  tagDialog.visible = true;
+}
+
+async function submitTagForm() {
+  const recordId = tagDialog.recordId;
+  const newTagIds = new Set(tagDialog.assignedIds);
+  const assignedTagsRes = await getTagsByRecordId(recordId);
+  const oldTagIds = new Set(assignedTagsRes.data.map(t => t.tagId));
+
+  const toAdd = [...newTagIds].filter(id => !oldTagIds.has(id));
+  const toRemove = [...oldTagIds].filter(id => !newTagIds.has(id));
+
+  try {
+    await Promise.all([
+      ...toAdd.map(tagId => addTagToRecord({ recordId, tagId })),
+      ...toRemove.map(tagId => removeTagFromRecord({ recordId, tagId }))
+    ]);
+    ElMessage.success("标签分配成功");
+    tagDialog.visible = false;
+  } catch (error) {
+    ElMessage.error("标签分配失败");
+  }
+}
+
+// --- 其他方法保持不变 ---
 function handleBeforeUpload(file) {
   const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
   const isLt10M = file.size / 1024 / 1024 < 10;
@@ -95,16 +166,13 @@ function handleBeforeUpload(file) {
   if (!isLt10M) ElMessage.error('上传文件大小不能超过 10MB!');
   return isExcel && isLt10M;
 }
-
 function handleUploadSuccess(response) {
   ElMessage.success(response.data || '数据导入成功！');
   getList();
 }
-
 function handleUploadError() {
   ElMessage.error('文件上传失败，请检查文件格式或联系管理员！');
 }
-
 function handleExport() {
   ElMessageBox.confirm('您确定要导出所有患者记录吗？', '提示', {
     confirmButtonText: '确定',
@@ -133,7 +201,6 @@ function handleExport() {
     });
   }).catch(() => {});
 }
-
 function handleCleanse() {
   cleanseLoading.value = true;
   cleanseData().then(response => {
@@ -151,7 +218,6 @@ function handleCleanse() {
     getList();
   });
 }
-
 function handleDeduplicate() {
   deduplicateLoading.value = true;
   deduplicateData().then(response => {

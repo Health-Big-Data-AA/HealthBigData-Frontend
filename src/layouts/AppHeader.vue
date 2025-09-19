@@ -24,6 +24,7 @@
         <el-menu-item index="/roles">角色管理</el-menu-item>
         <el-menu-item index="/permissions">权限管理</el-menu-item>
         <el-menu-item index="/data">数据管理</el-menu-item>
+        <el-menu-item index="/tags">标签管理</el-menu-item>
         <el-menu-item index="/statistics">统计分析</el-menu-item>
         <el-menu-item index="/logs">日志审计</el-menu-item>
       </el-menu>

@@ -8,8 +8,9 @@ import DashboardView from '../views/DashboardView.vue'
 import UserManagementView from '../views/UserManagementView.vue'
 import RoleManagementView from '../views/RoleManagementView.vue'
 import DataManagementView from '../views/DataManagementView.vue'
-// [新增] 导入新创建的权限管理视图
 import PermissionManagementView from '../views/PermissionManagementView.vue'
+// [新增] 导入新创建的标签管理视图
+import TagManagementView from '../views/TagManagementView.vue'
 import StatisticsView from '../views/StatisticsView.vue'
 import LogAuditView from '../views/LogAuditView.vue'
 import AccountView from '../views/AccountView.vue'
@@ -48,7 +49,6 @@ const router = createRouter({
       component: RoleManagementView,
       meta: { requiresAuth: true, title: '角色管理', roles: ['ADMIN'] }
     },
-    // [新增] 添加权限管理页面的路由规则
     {
       path: '/permissions',
       name: 'permissions',
@@ -60,6 +60,13 @@ const router = createRouter({
       name: 'data',
       component: DataManagementView,
       meta: { requiresAuth: true, title: '数据管理' }
+    },
+    // [新增] 添加标签管理页面的路由规则
+    {
+      path: '/tags',
+      name: 'tags',
+      component: TagManagementView,
+      meta: { requiresAuth: true, title: '标签管理' }
     },
     {
       path: '/statistics',
