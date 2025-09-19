@@ -6,7 +6,7 @@
   >
     <h2 class="section-title">{{ title }}</h2>
     <div class="horizontal-scroll-container" ref="scrollContainer">
-      <div class="card-list" :class="{ 'is-active': isHovering }">
+      <div class="card-list" ref="cardList">
         <slot></slot>
       </div>
     </div>
@@ -24,6 +24,7 @@ defineProps({
 const emit = defineEmits(['update:active']);
 
 const scrollContainer = ref(null);
+const cardList = ref(null); // Add a new ref for the card list
 const isHovering = ref(false);
 
 // --- [新增] 惯性滚动所需变量 ---
@@ -33,6 +34,11 @@ const friction = 0.92; // 摩擦力系数，值越小，停止得越快
 
 // --- [修改] 滚轮事件处理 ---
 const handleWheel = (event) => {
+  // If the event target is the card list container itself (the gap), do not prevent default scrolling.
+  if (event.target === cardList.value) {
+    return;
+  }
+
   if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
     event.preventDefault();
     // 不再直接滚动，而是给一个“推力”（速度）
@@ -68,16 +74,20 @@ const startMomentumScroll = () => {
 const handleMouseEnter = () => {
   isHovering.value = true;
   emit('update:active', true); // 通知父组件，背景变暗
+  if (scrollContainer.value) {
+    scrollContainer.value.addEventListener('wheel', handleWheel, { passive: false });
+  }
 };
 const handleMouseLeave = () => {
   isHovering.value = false;
   emit('update:active', false); // 通知父组件，背景恢复
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener('wheel', handleWheel);
+  }
 };
 
 onMounted(() => {
-  if (scrollContainer.value) {
-    scrollContainer.value.addEventListener('wheel', handleWheel, { passive: false });
-  }
+  // No longer adding the event listener on mount
 });
 
 onBeforeUnmount(() => {
@@ -134,6 +144,30 @@ onBeforeUnmount(() => {
     max-height: 450px; /* 限制最大高度 */
     flex-shrink: 0;
     white-space: normal;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.8rem;
+    padding-left: 20px;
+  }
+
+  .horizontal-scroll-container {
+    overflow-x: hidden; /* Hide horizontal scrollbar on mobile */
+  }
+
+  .card-list {
+    display: flex;
+    flex-direction: column; /* Stack cards vertically */
+    gap: 20px;
+    padding: 0 20px;
+
+    > :deep(*) {
+      width: 100%; /* Make cards full-width */
+      height: auto; /* Adjust height automatically */
+      max-height: none;
+    }
   }
 }
 </style>

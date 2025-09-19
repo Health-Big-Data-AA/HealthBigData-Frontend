@@ -69,8 +69,9 @@ const playVideo = (bvid) => {
   width: 100%;
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  overflow-y: auto; /* Changed from overflow-x: hidden to allow vertical scrolling */
   animation: fadeIn 1s ease-in-out;
+  isolation: isolate; /* Create a new stacking context to contain the aurora background */
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -104,6 +105,12 @@ const playVideo = (bvid) => {
 .hero-subtitle {
   font-size: clamp(1rem, 2vw, 1.25rem);
   color: #a0aec0;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    margin-bottom: 3rem;
+  }
 }
 
 .video-iframe-container {

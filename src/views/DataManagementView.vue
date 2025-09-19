@@ -85,7 +85,6 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { listRecordsByPage, exportRecords } from '@/api/patientRecord.js';
 import { cleanseData, deduplicateData } from '@/api/dataManagement.js';
 import { getStorage } from '@/utils/localStorage';
-// [新增] 导入标签相关的API
 import { getAllTags } from '@/api/tag.js';
 import { getTagsByRecordId, addTagToRecord, removeTagFromRecord } from '@/api/patientRecordTag.js';
 
@@ -101,7 +100,6 @@ const queryParams = reactive({
   pageSize: 10,
 });
 
-// [新增] 标签弹窗相关的数据
 const tagDialog = reactive({
   visible: false,
   recordId: null,
@@ -109,7 +107,9 @@ const tagDialog = reactive({
   assignedIds: []
 });
 
-const uploadUrl = ref('/api/api/records/import');
+// --- 【核心修改】修正上传地址，去掉重复的 /api ---
+const uploadUrl = ref('/api/records/import');
+
 const uploadHeaders = computed(() => ({
   Authorization: 'Bearer ' + getStorage('user-token')
 }));
@@ -127,7 +127,6 @@ function getList() {
   });
 }
 
-// --- [新增] 标签分配相关方法 ---
 async function handleAssignTag(row) {
   tagDialog.recordId = row.recordId;
   const allTagsRes = await getAllTags();
@@ -158,7 +157,6 @@ async function submitTagForm() {
   }
 }
 
-// --- 其他方法保持不变 ---
 function handleBeforeUpload(file) {
   const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === 'application/vnd.ms-excel';
   const isLt10M = file.size / 1024 / 1024 < 10;
@@ -166,13 +164,17 @@ function handleBeforeUpload(file) {
   if (!isLt10M) ElMessage.error('上传文件大小不能超过 10MB!');
   return isExcel && isLt10M;
 }
+
+// 修改成功回调，导入后刷新列表
 function handleUploadSuccess(response) {
   ElMessage.success(response.data || '数据导入成功！');
   getList();
 }
+
 function handleUploadError() {
   ElMessage.error('文件上传失败，请检查文件格式或联系管理员！');
 }
+
 function handleExport() {
   ElMessageBox.confirm('您确定要导出所有患者记录吗？', '提示', {
     confirmButtonText: '确定',
@@ -201,6 +203,8 @@ function handleExport() {
     });
   }).catch(() => {});
 }
+
+// 修改清洗和去重回调，操作后刷新列表
 function handleCleanse() {
   cleanseLoading.value = true;
   cleanseData().then(response => {
@@ -218,6 +222,7 @@ function handleCleanse() {
     getList();
   });
 }
+
 function handleDeduplicate() {
   deduplicateLoading.value = true;
   deduplicateData().then(response => {

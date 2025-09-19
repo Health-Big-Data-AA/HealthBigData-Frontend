@@ -262,4 +262,16 @@ onMounted(() => {
     margin-bottom: 20px;
   }
 }
+
+@media (max-width: 768px) {
+  .panel-group {
+    .card-panel-col {
+      width: 50%;
+    }
+  }
+
+  .el-row .el-col[sm="24"] {
+    width: 100%;
+  }
+}
 </style>

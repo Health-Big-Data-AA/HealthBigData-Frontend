@@ -229,4 +229,16 @@ const handleResetPassword = () => {
 .slide-fade-enter-active,.slide-fade-leave-active{transition:all .5s cubic-bezier(.25,.8,.25,1)}
 .slide-fade-enter-from{opacity:0;transform:translateX(30px)}
 .slide-fade-leave-to{opacity:0;transform:translateX(-30px)}
+
+@media (max-width: 768px) {
+  .form-card {
+    width: 90%;
+    margin: 20px;
+    padding: 15px;
+  }
+  .back-home {
+    top: 15px;
+    left: 15px;
+  }
+}
 </style>
