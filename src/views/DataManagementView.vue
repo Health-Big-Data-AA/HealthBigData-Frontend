@@ -41,13 +41,13 @@
         </el-form-item>
       </el-form>
 
-      <el-table v-loading="loading" :data="recordList">
-        <el-table-column label="记录ID" align="center" prop="recordId" />
+      <el-table v-loading="loading" :data="recordList" @sort-change="handleSortChange">
+        <el-table-column label="记录ID" align="center" prop="recordId" sortable="custom" />
         <el-table-column label="患者标识" align="center" prop="patientIdentifier" />
         <el-table-column label="记录类型" align="center" prop="recordType" />
         <el-table-column label="创建人ID" align="center" prop="createdByUserId" />
-        <el-table-column label="创建时间" align="center" prop="createTime" width="180"/>
-        <el-table-column label="更新时间" align="center" prop="updateTime" width="180"/>
+        <el-table-column label="创建时间" align="center" prop="createTime" width="180" sortable="custom" />
+        <el-table-column label="更新时间" align="center" prop="updateTime" width="180" sortable="custom" />
         <el-table-column label="已分配标签" align="center" width="200">
           <template #default="scope">
             <el-tag
@@ -126,7 +126,9 @@ const total = ref(0);
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  recordType: ''
+  recordType: '',
+  orderByColumn: '',
+  sortOrder: ''
 });
 
 const tagDialog = reactive({
@@ -168,6 +170,18 @@ const handleSearch = () => {
 const resetQuery = () => {
   queryParams.recordType = '';
   handleSearch();
+};
+
+const handleSortChange = ({ prop, order }) => {
+  if (order) {
+    queryParams.orderByColumn = prop;
+    queryParams.sortOrder = order === 'ascending' ? 'asc' : 'desc';
+  } else {
+    // Default sorting or clear sorting
+    queryParams.orderByColumn = '';
+    queryParams.sortOrder = '';
+  }
+  getList();
 };
 
 async function handleAssignTag(row) {

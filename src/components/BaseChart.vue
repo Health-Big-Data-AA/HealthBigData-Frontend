@@ -59,6 +59,10 @@ const handleResize = () => {
   chartInstance?.resize();
 }
 
+defineExpose({
+  resize: handleResize
+});
+
 onMounted(() => {
   initChart();
   window.addEventListener('resize', handleResize);
